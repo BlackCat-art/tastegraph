@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <main className="relative z-10 mx-auto flex min-h-screen max-w-3xl flex-col px-6 py-16">
@@ -29,17 +31,13 @@ export default function HomePage() {
           <div className="flex-1 rounded-lg border border-line bg-bgcard px-4 py-3 font-mono text-sm text-fgmute">
             https://open.spotify.com/playlist/...
           </div>
-          <button
-            type="button"
-            disabled
-            className="cursor-not-allowed rounded-lg bg-accent/30 px-6 py-3 text-sm font-semibold text-fgfaint"
+          <Link
+            href="/create"
+            className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-bg hover:bg-accent2"
           >
-            Generate your poster →
-          </button>
+            Try the parser →
+          </Link>
         </div>
-        <p className="mt-3 text-xs text-fgfaint">
-          Button is disabled in Day 1 build. Coming in Day 2.
-        </p>
 
         <div className="mt-20 grid gap-6 sm:grid-cols-3">
           <Feature title="URL-first" body="Paste a Spotify link. No screenshots, no copy-pasting song names." />
