@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { scorePlaylist, type ScoreRequest } from "@/lib/scoring";
 import type { Track } from "@/lib/types";
 
-// Cross-runtime env access:
-//   - CF Workers (production): @opennextjs/cloudflare's getCloudflareContext().
-//     This package is injected into the build's .open-next/ cache at deploy time,
-//     NOT present in local node_modules — dynamic import + try/catch handles it.
-//   - Local Node dev: process.env (only OPENAI_* apply, no AI binding).
 async function getEnv(): Promise<Record<string, any>> {
-  try {
-    const mod: any = await import("@opennextjs/cloudflare");
-    if (typeof mod.getCloudflareContext === "function") {
-      const ctx = await mod.getCloudflareContext({ async: true });
+  if (typeof getCloudflareContext === "function") {
+    try {
+      const ctx = await getCloudflareContext({ async: true });
       if (ctx?.env) return ctx.env as Record<string, any>;
+    } catch {
+      // Cloudflare runtime not available (local dev). Fall through.
     }
-  } catch {
-    // Module not available (local dev). Fall through.
   }
   return process.env as unknown as Record<string, any>;
 }
