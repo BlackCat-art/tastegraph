@@ -9,7 +9,6 @@ import type { Track } from "@/lib/types";
 //   - Local Node dev: process.env (only OPENAI_* apply, no AI binding).
 async function getEnv(): Promise<Record<string, any>> {
   try {
-    // @ts-expect-error: @opennextjs/cloudflare is injected at deploy time on CF Pages; absent in local dev (try/catch falls through to process.env).
     const mod: any = await import("@opennextjs/cloudflare");
     if (typeof mod.getCloudflareContext === "function") {
       const ctx = await mod.getCloudflareContext({ async: true });
