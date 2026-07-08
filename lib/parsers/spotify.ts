@@ -222,6 +222,12 @@ function toTrack(obj: any): Track | null {
     track.releaseYear = obj.releaseYear;
   }
 
+  // Opportunistic: capture popularity (0-100) if Spotify's embed JSON
+  // happens to include it. Not in the Track type yet, so stash via any.
+  if (typeof obj.popularity === "number") {
+    (track as any).popularity = obj.popularity;
+  }
+
   return track;
 }
 
@@ -324,12 +330,21 @@ export async function parseSpotify(urlOrId: string): Promise<ParseResult> {
       };
     }
 
+    const tracks_with_extras = tracks.map((t) => ({
+      name: t.name,
+      artist: t.artist,
+      albumArtUrl: t.albumArtUrl,
+      spotifyId: t.spotifyId,
+      popularity: typeof (t as any).popularity === "number" ? (t as any).popularity : undefined,
+      releaseYear: typeof (t as any).releaseYear === "number" ? (t as any).releaseYear : undefined,
+    }));
+
     const playlist: Playlist = {
       title,
       owner: $('meta[property="og:description"]').attr("content") ?? undefined,
       platform: "spotify",
-      trackCount: tracks.length,
-      tracks: tracks.length > 200 ? tracks.slice(0, 200) : tracks,
+      trackCount: tracks_with_extras.length,
+      tracks: tracks_with_extras,
     };
 
     return { ok: true, playlist };

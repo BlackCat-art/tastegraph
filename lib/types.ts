@@ -43,3 +43,62 @@ export type ParseError = {
 };
 
 export type ParseResult = ParseSuccess | ParseError;
+
+// === Day 3 additions ===
+
+export type MoodVector = {
+  happy: number;     // 0..100
+  sad: number;       // 0..100
+  energetic: number; // 0..100
+  chill: number;     // 0..100
+};
+
+export type Genre = "Indie" | "Pop" | "Hip-Hop" | "R&B" | "Electronic"
+        | "Rock" | "Jazz" | "Classical" | "Country" | "Folk" | "Latin" | "K-Pop";
+
+export type ScoredTrack = Track & {
+  popularity?: number;     // 0..100, Spotify-sourced
+  releaseYear?: number;    // 4-digit year
+  primaryGenre?: Genre;
+  secondaryGenre?: Genre;
+  mood?: MoodVector;
+};
+
+export type Scores = {
+  decadeSpread: number;
+  genreBalance: number;
+  mainstreamScore: number;
+  moodSpectrum: number;
+  discoveryIndex: number;
+};
+
+export type ScoreResult = {
+  scores: Scores;
+  personalityLabel: string;
+  personalityOneLiner: string;
+  summary: string;
+  fromCache?: boolean;
+  debug?: {
+    parsedAt: string;
+    modelUsed: string;
+    providerUsed: "cf-ai" | "openai" | "heuristic";
+    neuronEstimate?: number;
+  };
+};
+
+export type ScoreError = {
+  ok: false;
+  error: {
+    code:
+      | "INVALID_INPUT"
+      | "TOO_SHORT"
+      | "TOO_MANY"
+      | "NO_LLM_PROVIDER"
+      | "LLM_FAILED"
+      | "INTERNAL";
+    message: string;
+    retryable: boolean;
+  };
+};
+
+export type ScoreResponse = ({ ok: true } & ScoreResult) | ({ ok: false } & ScoreError);
