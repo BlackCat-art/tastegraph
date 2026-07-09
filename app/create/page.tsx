@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { ScoreResult } from "@/lib/types";
+import RadarChart from "@/app/_components/RadarChart";
 
 type ParseOk = {
   kind: "ok";
@@ -15,22 +16,6 @@ type Result =
   | { kind: "scoring"; title: string; trackCount: number }
   | (ParseOk & { kind: "ok"; score?: ScoreResult; scoreWarning?: string })
   | { kind: "err"; code: string; message: string };
-
-// Radar chart math — pure, no Recharts dependency.
-function radarPoints(scores: ScoreResult["scores"], cx = 120, cy = 120, r = 90): string {
-  const labels: Array<keyof ScoreResult["scores"]> = [
-    "decadeSpread", "genreBalance", "mainstreamScore", "moodSpectrum", "discoveryIndex",
-  ];
-  const step = (Math.PI * 2) / labels.length;
-  return labels
-    .map((k, i) => {
-      const ratio = scores[k] / 100;
-      const x = cx + Math.cos(step * i - Math.PI / 2) * r * ratio;
-      const y = cy + Math.sin(step * i - Math.PI / 2) * r * ratio;
-      return `${x.toFixed(2)},${y.toFixed(2)}`;
-    })
-    .join(" ");
-}
 
 export default function CreatePage() {
   const [url, setUrl] = useState("");
@@ -149,47 +134,13 @@ export default function CreatePage() {
 
       {/* OK state with score */}
       {result.kind === "ok" && result.score && (
-        <div className="mt-8 grid gap-6 sm:grid-cols-2">
-          <div className="rounded-lg border border-line bg-bgcard p-5">
-            <div className="text-xs uppercase tracking-wide text-accent2">Personality</div>
-            <h2 className="mt-2 text-2xl font-bold text-fg">{result.score.personalityLabel}</h2>
-            <p className="mt-2 italic text-fgmute">&quot;{result.score.personalityOneLiner}&quot;</p>
-            <p className="mt-3 text-sm text-fg">{result.score.summary}</p>
-          </div>
-          <div className="rounded-lg border border-line bg-bgcard p-5 flex items-center justify-center">
-            <svg viewBox="0 0 240 240" className="w-full max-w-xs" aria-label="5-dimension radar chart">
-              {/* grid */}
-              {[0.25, 0.5, 0.75, 1].map((r) => (
-                <circle key={r} cx="120" cy="120" r={90 * r} fill="none"
-                  stroke="currentColor" className="text-line" strokeWidth="0.5" />
-              ))}
-              {/* axes */}
-              {["decade", "genre", "mainstream", "mood", "discovery"].map((_, i) => {
-                const step = (Math.PI * 2) / 5;
-                const x = 120 + Math.cos(step * i - Math.PI / 2) * 90;
-                const y = 120 + Math.sin(step * i - Math.PI / 2) * 90;
-                return (
-                  <line key={i} x1="120" y1="120" x2={x} y2={y}
-                    stroke="currentColor" className="text-line" strokeWidth="0.5" />
-                );
-              })}
-              {/* data polygon */}
-              <polygon points={radarPoints(result.score.scores)}
-                fill="currentColor" className="text-accent" fillOpacity="0.25" />
-              <polygon points={radarPoints(result.score.scores)}
-                fill="none" className="text-accent2" stroke="currentColor" strokeWidth="1.5" />
-              {/* labels */}
-              {["Decade", "Genre", "Mainstream", "Mood", "Discovery"].map((label, i) => {
-                const step = (Math.PI * 2) / 5;
-                const x = 120 + Math.cos(step * i - Math.PI / 2) * 108;
-                const y = 120 + Math.sin(step * i - Math.PI / 2) * 108;
-                return (
-                  <text key={label} x={x} y={y} textAnchor="middle"
-                    className="fill-fgmute text-[10px]">{label}</text>
-                );
-              })}
-            </svg>
-          </div>
+        <div className="mt-8">
+          <RadarChart
+            scores={result.score.scores}
+            personalityLabel={result.score.personalityLabel}
+            personalityOneLiner={result.score.personalityOneLiner}
+            summary={result.score.summary}
+          />
         </div>
       )}
 
