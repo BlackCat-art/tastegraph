@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toPng } from "html-to-image";
 import type { ScoreResult } from "@/lib/types";
 import PosterTemplate from "@/app/_components/poster/PosterTemplate";
 import { EDITORIAL_ACCENTS, type PosterKind, type EditorialAccent } from "@/app/_components/poster/types";
@@ -23,6 +24,31 @@ export default function CreatePage() {
   const [result, setResult] = useState<Result>({ kind: "idle" });
   const [posterKind, setPosterKind] = useState<PosterKind>("editorial");
   const [posterAccent, setPosterAccent] = useState<EditorialAccent>("orange");
+  const posterRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!posterRef.current) return;
+    try {
+      const dataUrl = await toPng(posterRef.current, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#0a0a0a",
+      });
+      const link = document.createElement("a");
+      const slug = result.kind === "ok" && result.score?.personalityLabel
+        ? result.score.personalityLabel
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, "")
+            .slice(0, 50)
+        : "poster";
+      link.download = `tastegraph-${slug}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (e) {
+      console.error("Download failed:", e);
+    }
+  };
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -194,6 +220,7 @@ export default function CreatePage() {
             {/* Live Preview */}
             <div className="mt-6 flex justify-center rounded-lg border border-line bg-bgsoft p-6">
               <PosterTemplate
+                ref={posterRef}
                 kind={posterKind}
                 accent={EDITORIAL_ACCENTS[posterAccent]}
                 personalityLabel={result.score.personalityLabel}
@@ -209,7 +236,7 @@ export default function CreatePage() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
-                onClick={() => console.log("TODO D5.6: html-to-image download")}
+                onClick={handleDownload}
                 className="rounded-lg border border-line bg-bgcard px-6 py-3 text-sm font-semibold text-fg hover:border-accent"
               >
                 Download PNG 🆓
