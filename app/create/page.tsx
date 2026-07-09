@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import type { ScoreResult } from "@/lib/types";
-import RadarChart from "@/app/_components/RadarChart";
+import PosterTemplate from "@/app/_components/poster/PosterTemplate";
+import { EDITORIAL_ACCENTS, type PosterKind, type EditorialAccent } from "@/app/_components/poster/types";
 
 type ParseOk = {
   kind: "ok";
@@ -20,6 +21,8 @@ type Result =
 export default function CreatePage() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<Result>({ kind: "idle" });
+  const [posterKind, setPosterKind] = useState<PosterKind>("editorial");
+  const [posterAccent, setPosterAccent] = useState<EditorialAccent>("orange");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -132,15 +135,94 @@ export default function CreatePage() {
         </div>
       )}
 
-      {/* OK state with score */}
+      {/* Step 2 + Step 3 combined: Personality + Template picker */}
       {result.kind === "ok" && result.score && (
-        <div className="mt-8">
-          <RadarChart
-            scores={result.score.scores}
-            personalityLabel={result.score.personalityLabel}
-            personalityOneLiner={result.score.personalityOneLiner}
-            summary={result.score.summary}
-          />
+        <div className="mt-8 space-y-8">
+          {/* Step 2: Personality summary (no longer in RadarChart) */}
+          <div className="rounded-lg border border-line bg-bgcard p-5">
+            <div className="text-xs uppercase tracking-wide text-accent2">Personality</div>
+            <h2 className="mt-2 text-2xl font-bold text-fg">{result.score.personalityLabel}</h2>
+            <p className="mt-2 italic text-fgmute">&ldquo;{result.score.personalityOneLiner}&rdquo;</p>
+            <p className="mt-3 text-sm text-fg">{result.score.summary}</p>
+          </div>
+
+          {/* Step 3: Pick a style */}
+          <div>
+            <div className="text-xs uppercase tracking-wide text-accent2">Step 3: Pick a style</div>
+
+            {/* Template thumbnails (3 buttons, only Editorial active) */}
+            <div className="mt-4 grid grid-cols-3 gap-3">
+              {(["editorial", "modernist", "risograph"] as const).map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  disabled={kind !== "editorial"}
+                  onClick={() => setPosterKind(kind)}
+                  className={`rounded-lg border p-3 text-left text-xs font-mono uppercase tracking-wide transition ${
+                    posterKind === kind
+                      ? "border-accent bg-bgcard text-fg"
+                      : "border-line bg-bgcard text-fgmute disabled:opacity-40"
+                  }`}
+                >
+                  <div className="font-bold">{kind}</div>
+                  <div className="mt-1 text-fgfaint normal-case tracking-normal">
+                    {kind === "editorial" && "Serif + radar + 1:1"}
+                    {kind === "modernist" && "Mono + numbers (D6+)"}
+                    {kind === "risograph" && "Risograph (D6+)"}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Accent palette (Editorial only) */}
+            <div className="mt-4 flex items-center gap-3">
+              <span className="text-xs uppercase tracking-wide text-fgmute">Accent:</span>
+              {Object.entries(EDITORIAL_ACCENTS).map(([key, color]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setPosterAccent(key as EditorialAccent)}
+                  aria-label={`Accent ${key}`}
+                  className={`h-6 w-6 rounded-full border-2 transition ${
+                    posterAccent === key ? "border-fg scale-110" : "border-line"
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+
+            {/* Live Preview */}
+            <div className="mt-6 flex justify-center rounded-lg border border-line bg-bgsoft p-6">
+              <PosterTemplate
+                kind={posterKind}
+                accent={EDITORIAL_ACCENTS[posterAccent]}
+                personalityLabel={result.score.personalityLabel}
+                personalityOneLiner={result.score.personalityOneLiner}
+                summary={result.score.summary}
+                scores={result.score.scores}
+                playlistTitle={result.title}
+                trackCount={result.trackCount}
+              />
+            </div>
+
+            {/* Action buttons (Download + Go Pro — both placeholders) */}
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => console.log("TODO D5.6: html-to-image download")}
+                className="rounded-lg border border-line bg-bgcard px-6 py-3 text-sm font-semibold text-fg hover:border-accent"
+              >
+                Download PNG 🆓
+              </button>
+              <button
+                type="button"
+                onClick={() => console.log("TODO D9: Stripe checkout")}
+                className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-bg hover:bg-accent2"
+              >
+                Go Pro $4.99
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -2,9 +2,9 @@ import type { ScoreResult } from "@/lib/types";
 
 type RadarChartProps = {
   scores: ScoreResult["scores"];
-  personalityLabel: string;
-  personalityOneLiner: string;
-  summary: string;
+  personalityLabel?: string;
+  personalityOneLiner?: string;
+  summary?: string;
   accentColor?: string;   // default '#E5681A'
   size?: number;          // default 320
   showValues?: boolean;   // default true
@@ -152,61 +152,18 @@ export default function RadarChart({
         })}
       </svg>
 
-      {/* Personality block below radar, full width */}
-      <div className="w-full rounded-lg border border-line bg-bgcard p-5">
-        <div className="text-xs uppercase tracking-wide text-accent2">
-          Personality
+      {personalityLabel && personalityOneLiner && summary && (
+        <div className="w-full rounded-lg border border-line bg-bgcard p-5">
+          <div className="text-xs uppercase tracking-wide text-accent2">
+            Personality
+          </div>
+          <h2 className="mt-2 text-2xl font-bold text-fg">{personalityLabel}</h2>
+          <p className="mt-2 italic text-fgmute">
+            &quot;{personalityOneLiner}&quot;
+          </p>
+          <p className="mt-3 text-sm text-fg">{summary}</p>
         </div>
-        <h2 className="mt-2 text-2xl font-bold text-fg">{personalityLabel}</h2>
-        <p className="mt-2 italic text-fgmute">
-          &quot;{personalityOneLiner}&quot;
-        </p>
-        <p className="mt-3 text-sm text-fg">{summary}</p>
-      </div>
-    </div>
-  );
-}
-
-// Day 4 temporary showcase for visual verification. Day 5 will delete this export.
-export function RadarChartShowcase() {
-  return (
-    <div className="grid grid-cols-1 gap-8 p-8 md:grid-cols-3">
-      <RadarChart
-        scores={{
-          decadeSpread: 50,
-          genreBalance: 50,
-          mainstreamScore: 50,
-          moodSpectrum: 50,
-          discoveryIndex: 50,
-        }}
-        personalityLabel="The Centerpiece"
-        personalityOneLiner="Equidistant from every genre."
-        summary="A balanced taste, evenly spread across decades, genres, mainstream, mood, and discovery."
-      />
-      <RadarChart
-        scores={{
-          decadeSpread: 30,
-          genreBalance: 20,
-          mainstreamScore: 90,
-          moodSpectrum: 60,
-          discoveryIndex: 15,
-        }}
-        personalityLabel="Mainstream Sunshine"
-        personalityOneLiner="You know every hit, and you're proud."
-        summary="Drawn to the top 40, with a clear preference for current popular sound."
-      />
-      <RadarChart
-        scores={{
-          decadeSpread: 80,
-          genreBalance: 90,
-          mainstreamScore: 15,
-          moodSpectrum: 40,
-          discoveryIndex: 95,
-        }}
-        personalityLabel="Late Night Explorer"
-        personalityOneLiner="You live in 2014 and cry to synthesizers."
-        summary="A nostalgic soul with eclectic taste, drawn to melancholic indie that's quietly underground."
-      />
+      )}
     </div>
   );
 }

@@ -21,6 +21,7 @@ const config: Config = {
       fontFamily: {
         sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "Inter", "sans-serif"],
         mono: ["JetBrains Mono", "SF Mono", "Menlo", "monospace"],
+      serif: ["Georgia", "GT Sectra", "Playfair Display", "Times New Roman", "serif"],
       },
     },
   },
