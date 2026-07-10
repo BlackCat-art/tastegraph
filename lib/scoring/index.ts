@@ -11,7 +11,7 @@
 // Each LLM call is wrapped in cacheGet/cacheSet. Cache hits short-circuit the call.
 
 import type { ScoredTrack, Track, Scores, ScoreResult } from "../types";
-import { callLLM, NoLLMProviderError, type ProviderUsed } from "./llm";
+import { callLLM, type ProviderUsed } from "./llm";
 import {
   buildGenrePrompt,
   buildMoodPrompt,
@@ -101,11 +101,9 @@ export async function scorePlaylist(
             });
           }
         }
-      } catch (e: any) {
-        if (e instanceof NoLLMProviderError) {
-          return { ok: false, error: { code: "NO_LLM_PROVIDER", message: e.message, retryable: false } };
-        }
-        // Soft-fail: drop to heuristic for the missing tracks.
+      } catch {
+        // D6.2: soft-fail — NoLLMProviderError or any LLM error → heuristic covers rest.
+        // (genre: heuristicGenreForBatch below; mood: heuristicMoodForBatch; label: labels.ts; summary: oneLiner template)
         providerUsed = "heuristic";
         modelUsed = "heuristic";
       }
