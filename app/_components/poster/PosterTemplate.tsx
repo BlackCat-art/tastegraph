@@ -10,9 +10,9 @@ const PosterTemplate = forwardRef<HTMLDivElement, PosterTemplateProps>(
       case "editorial":
         return <EditorialPoster ref={ref} {...props} />;
       case "modernist":
-        return <ModernistPoster ref={ref} />;
+        return <ModernistPoster ref={ref} {...props} />;
       case "risograph":
-        return <RisographPoster ref={ref} />;
+        return <RisographPoster ref={ref} {...props} />;
       default: {
         const _exhaustive: never = props.kind;
         throw new Error(`Unknown poster kind: ${_exhaustive}`);

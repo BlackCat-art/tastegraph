@@ -4,7 +4,15 @@ import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import type { ScoreResult } from "@/lib/types";
 import PosterTemplate from "@/app/_components/poster/PosterTemplate";
-import { EDITORIAL_ACCENTS, type PosterKind, type EditorialAccent } from "@/app/_components/poster/types";
+import {
+  EDITORIAL_ACCENTS,
+  MODERNIST_ACCENTS,
+  RISOGRAPH_PALETTES,
+  type PosterKind,
+  type EditorialAccent,
+  type ModernistAccent,
+  type RisographPalette,
+} from "@/app/_components/poster/types";
 
 type ParseOk = {
   kind: "ok";
@@ -23,7 +31,9 @@ export default function CreatePage() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<Result>({ kind: "idle" });
   const [posterKind, setPosterKind] = useState<PosterKind>("editorial");
-  const [posterAccent, setPosterAccent] = useState<EditorialAccent>("orange");
+  const [posterEditorialAccent, setPosterEditorialAccent] = useState<EditorialAccent>("orange");
+  const [posterModernistAccent, setPosterModernistAccent] = useState<ModernistAccent>("red");
+  const [posterRisographPalette, setPosterRisographPalette] = useState<RisographPalette>("blue-red");
   const posterRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = async () => {
@@ -176,43 +186,72 @@ export default function CreatePage() {
           <div>
             <div className="text-xs uppercase tracking-wide text-accent2">Step 3: Pick a style</div>
 
-            {/* Template thumbnails (3 buttons, only Editorial active) */}
+            {/* Template thumbnails (3 buttons, all active) */}
             <div className="mt-4 grid grid-cols-3 gap-3">
               {(["editorial", "modernist", "risograph"] as const).map((kind) => (
                 <button
                   key={kind}
                   type="button"
-                  disabled={kind !== "editorial"}
                   onClick={() => setPosterKind(kind)}
                   className={`rounded-lg border p-3 text-left text-xs font-mono uppercase tracking-wide transition ${
                     posterKind === kind
                       ? "border-accent bg-bgcard text-fg"
-                      : "border-line bg-bgcard text-fgmute disabled:opacity-40"
+                      : "border-line bg-bgcard text-fgmute"
                   }`}
                 >
                   <div className="font-bold">{kind}</div>
                   <div className="mt-1 text-fgfaint normal-case tracking-normal">
                     {kind === "editorial" && "Serif + radar + 1:1"}
-                    {kind === "modernist" && "Mono + numbers (D6+)"}
-                    {kind === "risograph" && "Risograph (D6+)"}
+                    {kind === "modernist" && "Mono + numbers (D6)"}
+                    {kind === "risograph" && "Risograph (D6)"}
                   </div>
                 </button>
               ))}
             </div>
 
-            {/* Accent palette (Editorial only) */}
+            {/* Accent palette (dynamic per kind) */}
             <div className="mt-4 flex items-center gap-3">
               <span className="text-xs uppercase tracking-wide text-fgmute">Accent:</span>
-              {Object.entries(EDITORIAL_ACCENTS).map(([key, color]) => (
+
+              {/* Editorial: 3 单色 dot */}
+              {posterKind === "editorial" && Object.entries(EDITORIAL_ACCENTS).map(([key, color]) => (
                 <button
                   key={key}
                   type="button"
-                  onClick={() => setPosterAccent(key as EditorialAccent)}
+                  onClick={() => setPosterEditorialAccent(key as EditorialAccent)}
                   aria-label={`Accent ${key}`}
                   className={`h-6 w-6 rounded-full border-2 transition ${
-                    posterAccent === key ? "border-fg scale-110" : "border-line"
+                    posterEditorialAccent === key ? "border-fg scale-110" : "border-line"
                   }`}
                   style={{ backgroundColor: color }}
+                />
+              ))}
+
+              {/* Modernist: 4 单色 dot */}
+              {posterKind === "modernist" && Object.entries(MODERNIST_ACCENTS).map(([key, color]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setPosterModernistAccent(key as ModernistAccent)}
+                  aria-label={`Accent ${key}`}
+                  className={`h-6 w-6 rounded-full border-2 transition ${
+                    posterModernistAccent === key ? "border-fg scale-110" : "border-line"
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+
+              {/* Risograph: 3 双色调色板 dot (linear-gradient) */}
+              {posterKind === "risograph" && Object.entries(RISOGRAPH_PALETTES).map(([key, palette]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setPosterRisographPalette(key as RisographPalette)}
+                  aria-label={`Palette ${key}`}
+                  className={`h-6 w-6 rounded-full border-2 transition ${
+                    posterRisographPalette === key ? "border-fg scale-110" : "border-line"
+                  }`}
+                  style={{ background: `linear-gradient(to right, ${palette.main} 50%, ${palette.accent} 50%)` }}
                 />
               ))}
             </div>
@@ -222,7 +261,14 @@ export default function CreatePage() {
               <PosterTemplate
                 ref={posterRef}
                 kind={posterKind}
-                accent={EDITORIAL_ACCENTS[posterAccent]}
+                accent={
+                  posterKind === "editorial" ? EDITORIAL_ACCENTS[posterEditorialAccent] :
+                  posterKind === "modernist" ? MODERNIST_ACCENTS[posterModernistAccent] :
+                  RISOGRAPH_PALETTES[posterRisographPalette].main
+                }
+                accent2={
+                  posterKind === "risograph" ? RISOGRAPH_PALETTES[posterRisographPalette].accent : undefined
+                }
                 personalityLabel={result.score.personalityLabel}
                 personalityOneLiner={result.score.personalityOneLiner}
                 summary={result.score.summary}
