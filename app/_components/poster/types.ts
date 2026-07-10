@@ -2,6 +2,24 @@ import type { ScoreResult } from "@/lib/types";
 
 export type PosterKind = "editorial" | "modernist" | "risograph";
 
+// D6+ 新增:aspectRatio 类型 + Tailwind class 映射
+export type AspectRatio = "1:1" | "3:4" | "9:16";
+
+export const ASPECT_RATIO_CLASS: Record<AspectRatio, string> = {
+  "1:1":  "aspect-square",
+  "3:4":  "aspect-[3/4]",
+  "9:16": "aspect-[9/16]",
+};
+
+// D6+ 新增:fontFamily 类型 + Tailwind class 映射
+export type FontFamily = "serif" | "mono" | "sans";
+
+export const FONT_FAMILY_CLASS: Record<FontFamily, string> = {
+  serif: "font-serif",
+  mono:  "font-mono",
+  sans:  "font-sans",
+};
+
 // Editorial 调色板(对照 PRD §5.5 模板 1)
 export const EDITORIAL_ACCENTS = {
   orange: "#E5681A",
@@ -40,6 +58,8 @@ export type PosterStyle = {
   kind: PosterKind;
   accent: string;
   accent2?: string;
+  aspectRatio?: AspectRatio;
+  fontFamily?: FontFamily;
 };
 
 export type PosterTemplateProps = PosterData & PosterStyle;

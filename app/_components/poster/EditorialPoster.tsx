@@ -1,6 +1,10 @@
 import { forwardRef } from "react";
 import RadarChart from "@/app/_components/RadarChart";
-import type { PosterTemplateProps } from "./types";
+import {
+  ASPECT_RATIO_CLASS,
+  FONT_FAMILY_CLASS,
+  type PosterTemplateProps,
+} from "./types";
 
 const EditorialPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
   function EditorialPoster({
@@ -10,26 +14,27 @@ const EditorialPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
     playlistTitle,
     trackCount,
     accent,
+    aspectRatio,
+    fontFamily,
   }, ref) {
+    const fontClass = FONT_FAMILY_CLASS[fontFamily ?? "serif"];
+
     return (
       <div
         ref={ref}
-        className="relative aspect-square w-full max-w-[480px] overflow-hidden rounded-lg border border-line bg-bg p-8 text-fg shadow-2xl"
+        className={`relative ${ASPECT_RATIO_CLASS[aspectRatio ?? "1:1"]} w-full max-w-[480px] overflow-hidden rounded-lg border border-line bg-bg p-8 text-fg shadow-2xl`}
       >
-        {/* Logo */}
+        {/* Logo — 保持 font-mono 品牌一致性 */}
         <div className="text-xs font-mono uppercase tracking-[0.2em] text-fgmute">
           tastegraph
         </div>
 
-        {/* Personality Title (Serif bold) */}
-        <h1
-          className="mt-6 text-4xl font-bold leading-tight text-fg"
-          style={{ fontFamily: "Georgia, 'GT Sectra', 'Playfair Display', serif" }}
-        >
+        {/* Personality Title — 接 fontFamily */}
+        <h1 className={`mt-6 text-4xl font-bold leading-tight text-fg ${fontClass}`}>
           {personalityLabel}
         </h1>
 
-        {/* Radar Chart */}
+        {/* RadarChart — size 不变 */}
         <div className="mt-8 flex items-center justify-center">
           <RadarChart
             scores={scores}
@@ -40,13 +45,13 @@ const EditorialPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
           />
         </div>
 
-        {/* OneLiner (italic, with quotes) */}
-        <p className="mt-8 text-center text-base italic text-fgmute">
+        {/* OneLiner — 接 fontFamily */}
+        <p className={`mt-8 text-center text-base italic text-fgmute ${fontClass}`}>
           &ldquo;{personalityOneLiner}&rdquo;
         </p>
 
-        {/* Playlist Info */}
-        <div className="mt-8 space-y-1 font-mono text-xs text-fgmute">
+        {/* Playlist Info — 接 fontFamily (覆盖原 font-mono) */}
+        <div className={`mt-8 space-y-1 text-xs text-fgmute ${fontClass}`}>
           <div>▣ {playlistTitle}</div>
           <div>▣ {trackCount} tracks</div>
         </div>

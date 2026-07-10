@@ -8,10 +8,13 @@ import {
   EDITORIAL_ACCENTS,
   MODERNIST_ACCENTS,
   RISOGRAPH_PALETTES,
+  FONT_FAMILY_CLASS,
   type PosterKind,
   type EditorialAccent,
   type ModernistAccent,
   type RisographPalette,
+  type AspectRatio,
+  type FontFamily,
 } from "@/app/_components/poster/types";
 
 type ParseOk = {
@@ -27,13 +30,27 @@ type Result =
   | (ParseOk & { kind: "ok"; score?: ScoreResult; scoreWarning?: string })
   | { kind: "err"; code: string; message: string };
 
+const DEFAULT_FONT_BY_KIND: Record<PosterKind, FontFamily> = {
+  editorial: "serif",
+  modernist: "mono",
+  risograph: "sans",
+};
+
 export default function CreatePage() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<Result>({ kind: "idle" });
   const [posterKind, setPosterKind] = useState<PosterKind>("editorial");
+  const [posterAspectRatio, setPosterAspectRatio] = useState<AspectRatio>("1:1");
+  const [posterFontFamily, setPosterFontFamily] = useState<FontFamily>(DEFAULT_FONT_BY_KIND["editorial"]);
   const [posterEditorialAccent, setPosterEditorialAccent] = useState<EditorialAccent>("orange");
   const [posterModernistAccent, setPosterModernistAccent] = useState<ModernistAccent>("red");
   const [posterRisographPalette, setPosterRisographPalette] = useState<RisographPalette>("blue-red");
+
+  const handleTemplateChange = (kind: PosterKind) => {
+    setPosterKind(kind);
+    setPosterFontFamily(DEFAULT_FONT_BY_KIND[kind]);
+  };
+
   const posterRef = useRef<HTMLDivElement>(null);
 
   const handleDownload = async () => {
@@ -192,7 +209,7 @@ export default function CreatePage() {
                 <button
                   key={kind}
                   type="button"
-                  onClick={() => setPosterKind(kind)}
+                  onClick={() => handleTemplateChange(kind)}
                   className={`rounded-lg border p-3 text-left text-xs font-mono uppercase tracking-wide transition ${
                     posterKind === kind
                       ? "border-accent bg-bgcard text-fg"
@@ -207,6 +224,48 @@ export default function CreatePage() {
                   </div>
                 </button>
               ))}
+            </div>
+
+            {/* Aspect Ratio picker — D6+ 新 */}
+            <div className="mt-4">
+              <div className="text-xs uppercase tracking-wide text-fgmute">Aspect ratio:</div>
+              <div className="mt-2 flex gap-2">
+                {(["1:1", "3:4", "9:16"] as const).map((ratio) => (
+                  <button
+                    key={ratio}
+                    type="button"
+                    onClick={() => setPosterAspectRatio(ratio)}
+                    className={`rounded-lg border px-4 py-2 text-sm font-mono transition ${
+                      posterAspectRatio === ratio
+                        ? "border-accent bg-bgcard text-fg"
+                        : "border-line bg-bgcard text-fgmute hover:text-fg"
+                    }`}
+                  >
+                    {ratio}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Font Family picker — D6+ 新 */}
+            <div className="mt-4">
+              <div className="text-xs uppercase tracking-wide text-fgmute">Font:</div>
+              <div className="mt-2 flex gap-2">
+                {(["serif", "mono", "sans"] as const).map((font) => (
+                  <button
+                    key={font}
+                    type="button"
+                    onClick={() => setPosterFontFamily(font)}
+                    className={`rounded-lg border px-4 py-2 text-sm transition ${
+                      posterFontFamily === font
+                        ? "border-accent bg-bgcard text-fg"
+                        : "border-line bg-bgcard text-fgmute hover:text-fg"
+                    } ${FONT_FAMILY_CLASS[font]}`}
+                  >
+                    {font}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Accent palette (dynamic per kind) */}
@@ -261,6 +320,8 @@ export default function CreatePage() {
               <PosterTemplate
                 ref={posterRef}
                 kind={posterKind}
+                aspectRatio={posterAspectRatio}
+                fontFamily={posterFontFamily}
                 accent={
                   posterKind === "editorial" ? EDITORIAL_ACCENTS[posterEditorialAccent] :
                   posterKind === "modernist" ? MODERNIST_ACCENTS[posterModernistAccent] :

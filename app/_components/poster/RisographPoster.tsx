@@ -1,5 +1,9 @@
 import { forwardRef } from "react";
-import type { PosterTemplateProps } from "./types";
+import {
+  ASPECT_RATIO_CLASS,
+  FONT_FAMILY_CLASS,
+  type PosterTemplateProps,
+} from "./types";
 
 const RADAR_DIMS = [
   { key: "decadeSpread",    label: "Decade" },
@@ -11,9 +15,19 @@ const RADAR_DIMS = [
 
 const RisographPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
   function RisographPoster(
-    { personalityLabel, scores, playlistTitle, trackCount, accent, accent2 },
+    {
+      personalityLabel,
+      scores,
+      playlistTitle,
+      trackCount,
+      accent,
+      accent2,
+      aspectRatio,
+      fontFamily,
+    },
     ref
   ) {
+    const fontClass = FONT_FAMILY_CLASS[fontFamily ?? "sans"];
     const titleTokens = personalityLabel.toUpperCase().split(/\s+/).filter(Boolean).slice(0, 3);
 
     if (!accent2) {
@@ -23,10 +37,10 @@ const RisographPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
     return (
       <div
         ref={ref}
-        className="relative aspect-square w-full max-w-[480px] overflow-hidden p-8 shadow-2xl"
+        className={`relative ${ASPECT_RATIO_CLASS[aspectRatio ?? "1:1"]} w-full max-w-[480px] overflow-hidden p-8 shadow-2xl`}
         style={{ backgroundColor: "#FAF6EF" }}
       >
-        {/* Halftone background */}
+        {/* Halftone background — 不接 fontFamily */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
@@ -41,13 +55,13 @@ const RisographPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
           {accent2 && (
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 font-sans text-7xl font-black uppercase tracking-tight leading-none"
+              className={`pointer-events-none absolute inset-0 text-7xl font-black uppercase tracking-tight leading-none ${fontClass}`}
               style={{ color: accent2, transform: "translate(3px, 3px)" }}
             >
               {titleTokens.join(" ")}
             </span>
           )}
-          <div className="font-sans text-7xl font-black uppercase tracking-tight leading-none" style={{ color: accent }}>
+          <div className={`text-7xl font-black uppercase tracking-tight leading-none ${fontClass}`} style={{ color: accent }}>
             {titleTokens.map((t, i) => (
               <div key={i}>{t}</div>
             ))}
@@ -55,14 +69,14 @@ const RisographPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
         </div>
 
         {/* 5-axis breakdown */}
-        <div className="relative mt-12 space-y-1 font-mono text-xs" style={{ color: accent }}>
+        <div className={`relative mt-12 space-y-1 text-xs ${fontClass}`} style={{ color: accent }}>
           {RADAR_DIMS.map(({ key, label }) => (
             <div key={key}>• {label} {scores[key]}</div>
           ))}
         </div>
 
         {/* Bottom */}
-        <div className="relative mt-6 font-mono text-xs" style={{ color: accent, opacity: 0.7 }}>
+        <div className={`relative mt-6 text-xs ${fontClass}`} style={{ color: accent, opacity: 0.7 }}>
           {playlistTitle} · {trackCount} tracks
         </div>
       </div>
