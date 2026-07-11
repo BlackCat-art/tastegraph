@@ -17,6 +17,7 @@ Next.js 14 (App Router) · TypeScript · Tailwind · Vercel
 ```bash
 nvm use 20          # or any Node >= 18.17
 npm install
+npm run migrate     # apply DB schema (D7+)
 npm run dev         # → http://localhost:3000
 ```
 
@@ -29,7 +30,62 @@ npm run start
 
 ## Deploy
 
-Pushed commits to `main` auto-deploy via Vercel.
+Pushed commits to `main` auto-deploy via Cloudflare Pages + OpenNext.
+
+## D7 Setup — Magic Link Auth
+
+D7 adds user accounts via email magic link (PRD §5.7).
+
+### 1. Sign up for Neon (free, no credit card)
+- https://console.neon.tech → Sign in with GitHub
+- Create project: name `tastegraph`, region **AWS US East 1**
+- ⚠️ Keep **Neon Auth** toggle OFF (we use our own auth tables)
+- Copy the connection string from the dashboard
+
+### 2. Sign up for Resend (free, 100 emails/day)
+- https://resend.com → Sign up with GitHub
+- Create API Key in dashboard (name `tastegraph-dev`, permission "Sending access")
+- Use `onboarding@resend.dev` as the from-email (no domain verification needed)
+
+### 3. Generate JWT secret
+```bash
+openssl rand -base64 32
+```
+
+### 4. Configure `.dev.vars` (local dev)
+Create `~/dev/tastegraph/.dev.vars` (gitignored, permissions 600):
+```
+DATABASE_URL=postgresql://...
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=onboarding@resend.dev
+JWT_SECRET=<output from step 3>
+```
+
+### 5. Run migration
+```bash
+npm run migrate
+```
+Should print `[migrate] applied: 0000_init.sql` + `[migrate] done.`
+
+### 6. Run dev server
+```bash
+npm run dev
+```
+Open http://localhost:3000/create → click "Sign in" → enter email → check inbox (or click devLink in console if dev mode).
+
+### Production (Cloudflare Pages)
+Set the same 4 vars as secrets:
+```bash
+wrangler pages secret put DATABASE_URL
+wrangler pages secret put RESEND_API_KEY
+wrangler pages secret put RESEND_FROM_EMAIL
+wrangler pages secret put JWT_SECRET
+```
+
+Run migration once before first deploy (point at prod DATABASE_URL):
+```bash
+DATABASE_URL=<prod-url> npm run migrate
+```
 
 ## Project layout
 
