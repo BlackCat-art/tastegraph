@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import type { ScoreResult } from "@/lib/types";
 import PosterTemplate from "@/app/_components/poster/PosterTemplate";
+import { AuthChip } from "@/app/_components/AuthChip";
+import { MagicLinkForm } from "@/app/_components/MagicLinkForm";
 import {
   EDITORIAL_ACCENTS,
   MODERNIST_ACCENTS,
@@ -45,6 +47,7 @@ export default function CreatePage() {
   const [posterEditorialAccent, setPosterEditorialAccent] = useState<EditorialAccent>("orange");
   const [posterModernistAccent, setPosterModernistAccent] = useState<ModernistAccent>("red");
   const [posterRisographPalette, setPosterRisographPalette] = useState<RisographPalette>("blue-red");
+  const [signInOpen, setSignInOpen] = useState(false);
 
   const handleTemplateChange = (kind: PosterKind) => {
     setPosterKind(kind);
@@ -148,10 +151,19 @@ export default function CreatePage() {
 
   return (
     <main className="relative z-10 mx-auto min-h-screen max-w-3xl px-6 py-16">
-      <header className="flex items-center gap-2 text-sm">
-        <a href="/" className="text-fgfaint hover:text-fgmute">← back</a>
-        <span className="text-fgfaint ml-2">/ create</span>
+      <header className="flex items-center justify-between gap-2 text-sm">
+        <div className="flex items-center gap-2">
+          <a href="/" className="text-fgfaint hover:text-fgmute">← back</a>
+          <span className="text-fgfaint ml-2">/ create</span>
+        </div>
+        <AuthChip onSignInClick={() => setSignInOpen(true)} />
       </header>
+
+      <MagicLinkForm
+        open={signInOpen}
+        onClose={() => setSignInOpen(false)}
+        onSignedIn={() => setSignInOpen(false)}
+      />
 
       <h1 className="mt-12 text-3xl font-bold tracking-tight text-fg">
         Paste your playlist link.
