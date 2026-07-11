@@ -2,25 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { hashMagicToken, isExpired } from "@/lib/auth/magic-link";
-import { signSessionToken } from "@/lib/auth/jwt";
-import { serializeSessionCookie, isProd } from "@/lib/auth/cookie";
+import { signVerifyToken } from "@/lib/auth/jwt";
+import { isProd } from "@/lib/auth/cookie";
 
 /**
- * GET /api/v1/auth/verify?token=...
+ * GET /api/v1/auth/verify?token=***
  *
- * Flow:
- * 1. 拿 query.token,缺失 → 302 /signin?error=missing_token
- * 2. 哈希 token,查 users 表(magic_token_hash 唯一命中)
- * 3. 没找到 → 302 /signin?error=invalid_token
- * 4. 找到但过期 → 302 /signin?error=expired_token
- * 5. 通过 → 清 magic token + 签 JWT + set cookie + 302 /create
+ * 2-step magic link flow(防邮件客户端预取):
  *
- * 单次使用:UPDATE 清 magic_token_hash,二次访问变 invalid_token
+ * Step 1: 本端点
+ *   - 验证 magic_token_hash 命中 + 未过期
+ *   - 签 5 分钟 verify JWT,set cookie `tastegraph_verify`
+ *   - 302 redirect /auth/confirm
+ *   - **不**清 magic_token_hash(留给 confirm endpoint 清)
  *
- * 安全:
- * - token 是不可猜测的(32 字节随机),CSRF 风险小
- * - HTTPS-only JWT cookie 携带签名 session
- * - 失败不泄漏 user 存在性(都返 invalid_token)
+ * Step 2: POST /api/v1/auth/confirm
+ *   - 读 verify cookie
+ *   - 清 magic_token_hash
+ *   - 签 session JWT,set cookie `tastegraph_session`
+ *   - 302 redirect /create
+ *
+ * 为什么这样设计:
+ * - 邮件客户端(163邮件大师 / Gmail / Outlook)预取邮件里的链接扫描恶意内容
+ * - 单步 verify 会让预取消耗 token,真人点击就 invalid_token
+ * - 2-step:预取只跑到 confirm 页面(无害,token 没被清),真人点 Confirm 才真消费
  */
 
 export const dynamic = "force-dynamic";
@@ -52,15 +57,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL("/signin?error=expired_token", req.url));
   }
 
-  // 通过校验:清 magic token + 签 JWT + set cookie
-  await db.execute(
-    sql`UPDATE users SET magic_token_hash = NULL, magic_expires_at = NULL WHERE id = ${user.id}`,
-  );
+  // 通过校验:签 verify JWT + set cookie + redirect /auth/confirm
+  // 注意:不立即清 magic_token_hash(留给 confirm 步骤)
+  const verifyJwt = await signVerifyToken({
+    sub: user.id,
+    email: user.email,
+    plan: user.plan,
+  });
+  const verifyCookie =
+    `tastegraph_verify=${verifyJwt}; HttpOnly; SameSite=Lax; Path=/; Max-Age=300` +
+    (isProd() ? "; Secure" : "");
 
-  const jwt = await signSessionToken({ sub: user.id, email: user.email, plan: user.plan });
-  const cookie = serializeSessionCookie(jwt, isProd());
-
-  const redirectResponse = NextResponse.redirect(new URL("/create", req.url));
-  redirectResponse.headers.set("Set-Cookie", cookie);
+  const redirectResponse = NextResponse.redirect(new URL("/auth/confirm", req.url));
+  redirectResponse.headers.set("Set-Cookie", verifyCookie);
   return redirectResponse;
 }

@@ -5,27 +5,30 @@ import { SignJWT, jwtVerify } from "jose";
  *
  * 设计要点:
  * - 用 jose 而非 jsonwebtoken:jose 原生支持 Web Crypto,Edge runtime 友好
- * - 模块顶层 fail-fast:JWT_SECRET 缺失立即 throw(任何引用 jwt.ts 的 route 启动期崩)
+ * - 懒加载 secret:JWT_SECRET 校验延后到函数调用,避免 build 时顶层 throw
+ *   (next build 会静态评估模块顶层代码,顶层 throw 会让 build 崩)
  * - 30 天有效:setExpirationTime("30d")
  * - payload 含 sub (user id) + email + plan,足够 AuthChip 渲染
  *
  * env 来源:
  * - 本地:.dev.vars
- * - 生产:wrangler pages secret put JWT_SECRET
+ * - 生产:wrangler secret put JWT_SECRET
  */
-if (!process.env.JWT_SECRET) {
-  throw new Error(
-    "JWT_SECRET environment variable is required (32+ bytes base64). " +
-      "Generate with: openssl rand -base64 32",
-  );
-}
-
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export interface SessionPayload {
   sub: string; // user.id (uuid)
   email: string;
   plan: string; // 'free' | 'pro'
+}
+
+function getSecret(): Uint8Array {
+  if (!process.env.JWT_SECRET) {
+    throw new Error(
+      "JWT_SECRET environment variable is required (32+ bytes base64). " +
+        "Generate with: openssl rand -base64 32",
+    );
+  }
+  return new TextEncoder().encode(process.env.JWT_SECRET);
 }
 
 export async function signSessionToken(payload: SessionPayload): Promise<string> {
@@ -34,12 +37,25 @@ export async function signSessionToken(payload: SessionPayload): Promise<string>
     .setSubject(payload.sub)
     .setIssuedAt()
     .setExpirationTime("30d")
-    .sign(secret);
+    .sign(getSecret());
+}
+
+/**
+ * 签 5 分钟短 token(用于 magic link 2-step confirm 流程的 verify cookie)
+ * 同样的 secret + payload 结构,只是 exp 短
+ */
+export async function signVerifyToken(payload: SessionPayload): Promise<string> {
+  return new SignJWT({ email: payload.email, plan: payload.plan })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(payload.sub)
+    .setIssuedAt()
+    .setExpirationTime("5m")
+    .sign(getSecret());
 }
 
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, getSecret());
     if (typeof payload.sub !== "string") return null;
     if (typeof payload.email !== "string") return null;
     if (typeof payload.plan !== "string") return null;

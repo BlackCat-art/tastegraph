@@ -9,6 +9,8 @@ const messages: Record<string, string> = {
   missing_token: "Missing sign-in token. Please request a new link from /create.",
   invalid_token: "Invalid or already-used sign-in token. Please request a new link.",
   expired_token: "Sign-in link has expired. Please request a new link from /create.",
+  missing_verify: "Verification cookie expired or missing. Please request a new link from /create.",
+  invalid_verify: "Verification token invalid or expired. Please request a new link from /create.",
   unknown: "Something went wrong. Please try again from /create.",
 };
 
