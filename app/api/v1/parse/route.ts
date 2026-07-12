@@ -5,29 +5,32 @@ import type { ParseResult } from "@/lib/types";
 // Day 2 only wires up Spotify. The other branches return 501 explicitly so
 // the UI can show "coming soon" without us accidentally breaking anything.
 export async function POST(req: NextRequest) {
-  // D8 rate limit
+  // D8 rate limit — per-day, per PRD §5.8.3
   const { getOptionalUser } = await import("@/lib/auth/session");
-  const { getRateLimitKey } = await import("@/lib/rate-limit/check");
-  const { checkRateLimit } = await import("@/lib/rate-limit/upstash");
+  const { checkRateLimit, getIdentifier } = await import("@/lib/rate-limit/upstash");
   const user = await getOptionalUser(req);
-  const rateKey = getRateLimitKey({ userId: user?.id, ip: req.headers.get("x-forwarded-for") ?? "127.0.0.1" });
-  const rateResult = await checkRateLimit(rateKey, user?.plan ?? null);
-  if (!rateResult.allowed) {
+  const { id } = getIdentifier(req, user?.id ?? null);
+  const rl = await checkRateLimit({ identifier: id, bucket: 'parse', plan: user?.plan ?? null });
+
+  if (rl.limit !== Infinity && !rl.allowed) {
     return NextResponse.json(
       {
         ok: false,
         error: {
-          code: "RATE_LIMITED",
-          message: `Rate limit exceeded. Try again in ${Math.ceil((rateResult.resetAt - Date.now()) / 1000)}s.`,
-          retryable: true,
+          code: 'RATE_LIMIT',
+          message: user
+            ? `Free plan limited to ${rl.limit} renders per day. Upgrade to Pro for unlimited.`
+            : `Free plan limited to ${rl.limit} renders per day. Sign in for 5/day, or upgrade to Pro.`,
+          retryable: false,
+          resetAt: rl.resetAt.toISOString(),
         },
       },
       {
         status: 429,
         headers: {
-          "X-RateLimit-Limit": String(user?.plan === "pro" ? 30 : user?.plan === "free" ? 10 : 3),
-          "X-RateLimit-Remaining": String(rateResult.remaining),
-          "X-RateLimit-Reset": String(rateResult.resetAt),
+          'X-RateLimit-Limit': String(rl.limit),
+          'X-RateLimit-Remaining': String(Math.max(0, rl.limit - rl.count)),
+          'X-RateLimit-Reset': String(Math.floor(rl.resetAt.getTime() / 1000)),
         },
       },
     );
@@ -87,7 +90,7 @@ export async function POST(req: NextRequest) {
   const status =
     result.error.code === "INVALID_URL" ? 400 :
     result.error.code === "TOO_SHORT" ? 400 :
-    result.error.code === "RATE_LIMITED" ? 429 :
+    result.error.code === "RATE_LIMIT" ? 429 :
     502; // PARSE_FAILED, FETCH_FAILED, EMPTY_PLAYLIST, INTERNAL
   return NextResponse.json({ error: result.error }, { status });
 }

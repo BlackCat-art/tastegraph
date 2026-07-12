@@ -47,14 +47,14 @@ export const renderLogs = pgTable(
 export const stripeEvents = pgTable(
   "stripe_events",
   {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    stripeEventId: text("stripe_event_id").notNull().unique(),
+    id: text("id").primaryKey(),
     type: text("type").notNull(),
-    payload: jsonb("payload").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    payload: jsonb("payload").notNull(),
   },
   (t) => ({
-    stripeEventIdIdx: index("stripe_events_event_id_idx").on(t.stripeEventId),
+    typeIdx: index("stripe_events_type_idx").on(t.type),
+    createdAtIdx: index("stripe_events_created_at_idx").on(t.createdAt),
   }),
 );
 

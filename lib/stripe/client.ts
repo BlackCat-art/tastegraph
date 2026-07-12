@@ -5,6 +5,15 @@
  * 支持本地 wrangler dev 和生产环境
  */
 
+function timingSafeEqualHex(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
 type StripeClientOptions = {
   apiKey: string;
   baseUrl?: string;
@@ -145,7 +154,7 @@ function createStripeClient(options: StripeClientOptions) {
         .map((b) => b.toString(16).padStart(2, "0"))
         .join("");
 
-      if (expectedSig !== sigPart.slice(3)) {
+      if (!timingSafeEqualHex(expectedSig, sigPart.slice(3))) {
         throw new Error("Invalid webhook signature");
       }
 
