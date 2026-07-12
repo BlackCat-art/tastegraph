@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getOptionalUser } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const user = await getCurrentUser(req);
+  // 用 getOptionalUser 而不是 getCurrentUser:JWT 里的 stripeId 可能 stale
+  // (用户先登录拿到 JWT,后来通过 Stripe webhook 写入 stripe_id)
+  // getOptionalUser 读 DB 拿最新 stripeId
+  const user = await getOptionalUser(req);
   if (!user) {
     return NextResponse.json(
       { ok: false, error: { code: "UNAUTHORIZED", message: "Sign in first", retryable: false } },
@@ -14,8 +17,8 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   if (!user.stripeId) {
     return NextResponse.json(
-      { ok: false, error: { code: "NO_STRIPE_CUSTOMER", message: "No Stripe customer found", retryable: false } },
-      { status: 400 },
+      { ok: false, error: { code: "NO_SUBSCRIPTION", message: "No active subscription found. Subscribe first.", retryable: false } },
+      { status: 404 },
     );
   }
 
@@ -32,7 +35,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   } catch (e: any) {
     return NextResponse.json(
       { ok: false, error: { code: "STRIPE_ERROR", message: e?.message ?? "Stripe error", retryable: true } },
-      { status: 500 },
+      { status: 502 },
     );
   }
 }
