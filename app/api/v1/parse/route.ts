@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
   const status =
     result.error.code === "INVALID_URL" ? 400 :
     result.error.code === "TOO_SHORT" ? 400 :
-    result.error.code === "RATE_LIMIT" ? 429 :
+    result.error.code === "RATE_LIMITED" ? 429 :
     502; // PARSE_FAILED, FETCH_FAILED, EMPTY_PLAYLIST, INTERNAL
   return NextResponse.json({ error: result.error }, { status });
 }

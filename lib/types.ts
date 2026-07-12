@@ -35,7 +35,7 @@ export type ParseError = {
       | "TOO_SHORT"      // < 5 tracks
       | "TOO_MANY"       // > 200 tracks
       | "FETCH_FAILED"
-      | "RATE_LIMIT"
+      | "RATE_LIMITED"
       | "INTERNAL";
     message: string;
     retryable: boolean;

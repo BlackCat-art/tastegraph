@@ -76,7 +76,7 @@ async function fetchEmbedHtml(playlistId: string): Promise<string> {
     },
   });
   if (res.status === 429) {
-    throw Object.assign(new Error("rate limited"), { code: "RATE_LIMIT" });
+    throw Object.assign(new Error("rate limited"), { code: "RATE_LIMITED" });
   }
   if (!res.ok) {
     throw Object.assign(new Error(`embed fetch returned ${res.status}`), {
@@ -284,11 +284,11 @@ export async function parseSpotify(urlOrId: string): Promise<ParseResult> {
     try {
       html = await fetchEmbedHtml(id);
     } catch (e: any) {
-      if (e?.code === "RATE_LIMIT") {
+      if (e?.code === "RATE_LIMITED") {
         return {
           ok: false,
           error: {
-            code: "RATE_LIMIT",
+            code: "RATE_LIMITED",
             message: "Spotify is rate-limiting us. Try again in a minute.",
             retryable: true,
           },
