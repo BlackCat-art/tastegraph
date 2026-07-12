@@ -33,8 +33,9 @@ export function AuthChip({ onSignInClick }: { onSignInClick: () => void }) {
       const res = await fetch("/api/v1/auth/me");
       if (res.ok) {
         const data = (await res.json()) as { user: User | null };
-        const userData: User = { id: data.user?.id ?? "", email: data.user?.email ?? "", plan: data.user?.plan ?? "free", stripeId: data.user?.stripeId ?? null };
-        setUser(userData);
+        // 直接用 data.user,不要 fallback 成空字段对象
+        // 那个对象是 truthy,会让 !user 走错分支(显示假的 Signed in as)
+        setUser(data.user);
       } else {
         setUser(null);
       }
