@@ -11,6 +11,23 @@ import { neon } from "@neondatabase/serverless";
 import * as fs from "node:fs";
 import * as path from "node:path";
 
+// 自动从 .dev.vars 加载 env(本地 migrate 专用,prod wrangler 注入 secret 不走这路径)
+function loadDevVars() {
+  const envPath = path.join(process.cwd(), ".dev.vars");
+  if (!fs.existsSync(envPath)) return;
+  const content = fs.readFileSync(envPath, "utf-8");
+  for (const line of content.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const m = trimmed.match(/^([A-Z_][A-Z0-9_]*)=(.*)$/);
+    if (m && !process.env[m[1]]) {
+      process.env[m[1]] = m[2];
+    }
+  }
+}
+
+loadDevVars();
+
 async function main() {
   const DATABASE_URL = process.env.DATABASE_URL;
   if (!DATABASE_URL) {

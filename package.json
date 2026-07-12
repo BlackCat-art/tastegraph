@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "migrate": "tsx scripts/migrate.ts",
-    "migrate-stripe": "npx wrangler d1 execute tastegraph-db --file=scripts/migrate-stripe.ts"
+    "migrate-stripe": "tsx scripts/migrate-stripe.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
