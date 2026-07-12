@@ -16,6 +16,33 @@ async function getEnv(): Promise<Record<string, any>> {
 }
 
 export async function POST(req: NextRequest) {
+  // D8 rate limit
+  const { getOptionalUser } = await import("@/lib/auth/session");
+  const { getRateLimitKey, checkRateLimit } = await import("@/lib/stripe/rate-limit");
+  const user = await getOptionalUser(req);
+  const rateKey = getRateLimitKey({ userId: user?.id, ip: req.headers.get("x-forwarded-for") ?? "127.0.0.1" });
+  const rateResult = checkRateLimit(rateKey, user?.plan ?? null);
+  if (!rateResult.allowed) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: "RATE_LIMITED",
+          message: `Rate limit exceeded. Try again in ${Math.ceil((rateResult.resetAt - Date.now()) / 1000)}s.`,
+          retryable: true,
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(user?.plan === "pro" ? 30 : user?.plan === "free" ? 10 : 3),
+          "X-RateLimit-Remaining": String(rateResult.remaining),
+          "X-RateLimit-Reset": String(rateResult.resetAt),
+        },
+      },
+    );
+  }
+
   let body: { tracks?: Track[]; playlistTitle?: string; playlistId?: string };
   try {
     body = await req.json();

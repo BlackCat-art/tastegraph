@@ -5,6 +5,33 @@ import type { ParseResult } from "@/lib/types";
 // Day 2 only wires up Spotify. The other branches return 501 explicitly so
 // the UI can show "coming soon" without us accidentally breaking anything.
 export async function POST(req: NextRequest) {
+  // D8 rate limit
+  const { getOptionalUser } = await import("@/lib/auth/session");
+  const { getRateLimitKey, checkRateLimit } = await import("@/lib/stripe/rate-limit");
+  const user = await getOptionalUser(req);
+  const rateKey = getRateLimitKey({ userId: user?.id, ip: req.headers.get("x-forwarded-for") ?? "127.0.0.1" });
+  const rateResult = checkRateLimit(rateKey, user?.plan ?? null);
+  if (!rateResult.allowed) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: "RATE_LIMITED",
+          message: `Rate limit exceeded. Try again in ${Math.ceil((rateResult.resetAt - Date.now()) / 1000)}s.`,
+          retryable: true,
+        },
+      },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(user?.plan === "pro" ? 30 : user?.plan === "free" ? 10 : 3),
+          "X-RateLimit-Remaining": String(rateResult.remaining),
+          "X-RateLimit-Reset": String(rateResult.resetAt),
+        },
+      },
+    );
+  }
+
   let body: { type?: string; payload?: string };
   try {
     body = await req.json();
@@ -22,12 +49,6 @@ export async function POST(req: NextRequest) {
       { status: 400 }
     );
   }
-
-  // Rate limit: 30 parses / IP / 10 min. (Day 2 dev setting — tighten later.)
-  // Trae should install @upstash/ratelimit + @upstash/redis on Day 7.
-  // For now, this is a no-op stub.
-  // const ip = req.headers.get('x-forwarded-for') ?? 'unknown';
-  // await checkRateLimit(ip);
 
   let result: ParseResult;
   switch (type) {

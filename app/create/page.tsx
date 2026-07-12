@@ -91,7 +91,15 @@ export default function CreatePage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: "url", payload: url }),
       });
-      const parseData = await parseRes.json();
+      const parseData = await parseRes.json() as any;
+      if (parseRes.status === 429) {
+        setResult({
+          kind: "err",
+          code: "RATE_LIMITED",
+          message: parseData.error?.message ?? "Too many requests. Please wait.",
+        });
+        return;
+      }
       if (!parseRes.ok || !parseData.ok) {
         const err = parseData.error ?? { code: "INTERNAL", message: "Unknown error" };
         setResult({ kind: "err", code: err.code, message: err.message });
@@ -111,7 +119,17 @@ export default function CreatePage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ tracks: playlist.tracks, playlistTitle: playlist.title }),
         });
-        const scoreData = await scoreRes.json();
+        const scoreData = await scoreRes.json() as any;
+        if (scoreRes.status === 429) {
+          setResult({
+            kind: "ok",
+            title: playlist.title,
+            trackCount: playlist.tracks.length,
+            tracks: playlist.tracks,
+            scoreWarning: "Rate limited during scoring. Please try again.",
+          });
+          return;
+        }
         if (!scoreRes.ok || !scoreData.ok) {
           // Keep parsed view + soft warning.
           setResult({

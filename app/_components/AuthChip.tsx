@@ -21,6 +21,7 @@ interface User {
   id: string;
   email: string;
   plan: string;
+  stripeId: string | null;
 }
 
 export function AuthChip({ onSignInClick }: { onSignInClick: () => void }) {
@@ -32,7 +33,8 @@ export function AuthChip({ onSignInClick }: { onSignInClick: () => void }) {
       const res = await fetch("/api/v1/auth/me");
       if (res.ok) {
         const data = (await res.json()) as { user: User | null };
-        setUser(data.user);
+        const userData: User = { id: data.user?.id ?? "", email: data.user?.email ?? "", plan: data.user?.plan ?? "free", stripeId: data.user?.stripeId ?? null };
+        setUser(userData);
       } else {
         setUser(null);
       }
@@ -72,6 +74,34 @@ export function AuthChip({ onSignInClick }: { onSignInClick: () => void }) {
   return (
     <div className="flex items-center gap-3 text-sm">
       <span className="text-fgmute">Signed in as {user.email}</span>
+      {user.plan === "pro" && (
+        <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-bg">PRO</span>
+      )}
+      <div className="flex gap-1">
+        {user.plan === "pro" ? (
+          <button
+            onClick={async () => {
+              const res = await fetch("/api/v1/stripe/portal", { method: "POST" });
+              const body = await res.json() as { ok: boolean; url?: string };
+              if (body.ok && body.url) window.location.href = body.url;
+            }}
+            className="text-xs text-fgmute hover:text-fg"
+          >
+            Manage
+          </button>
+        ) : (
+          <button
+            onClick={async () => {
+              const res = await fetch("/api/v1/stripe/checkout", { method: "POST" });
+              const body = await res.json() as { ok: boolean; url?: string };
+              if (body.ok && body.url) window.location.href = body.url;
+            }}
+            className="rounded bg-accent px-2 py-0.5 text-xs font-semibold text-bg hover:bg-accent2"
+          >
+            Go Pro
+          </button>
+        )}
+      </div>
       <button
         onClick={handleSignOut}
         className="text-fgmute hover:text-fg transition-colors underline"

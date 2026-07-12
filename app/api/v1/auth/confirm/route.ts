@@ -58,6 +58,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     sub: userId,
     email: verifyPayload.email,
     plan: verifyPayload.plan,
+    stripeId: (verifyPayload as any).stripeId ?? null,
   });
   const sessionCookie = serializeSessionCookie(sessionJwt, isProd());
 

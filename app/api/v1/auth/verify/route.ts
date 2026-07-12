@@ -39,12 +39,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   const tokenHash = await hashMagicToken(token);
 
   const result = await db.execute(
-    sql`SELECT id, email, plan, magic_expires_at FROM users WHERE magic_token_hash = ${tokenHash} LIMIT 1`,
+    sql`SELECT id, email, plan, stripe_id, magic_expires_at FROM users WHERE magic_token_hash = ${tokenHash} LIMIT 1`,
   );
   const rows = result.rows as Array<{
     id: string;
     email: string;
     plan: string;
+    stripe_id: string | null;
     magic_expires_at: string;
   }>;
 
@@ -63,6 +64,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     sub: user.id,
     email: user.email,
     plan: user.plan,
+    stripeId: (rows[0] as any).stripe_id ?? null,
   });
   const verifyCookie =
     `tastegraph_verify=${verifyJwt}; HttpOnly; SameSite=Lax; Path=/; Max-Age=300` +

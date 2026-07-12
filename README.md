@@ -106,3 +106,20 @@ package.json
 | 2 | URL parsing (Spotify → Track[]) |
 | 3 | 5-dimension scoring engine |
 | … | (see PRD §15) |
+
+## D8 Stripe Subscription
+
+- **Checkout**: `POST /api/v1/stripe/checkout` → 创建 Stripe checkout session,返回 redirect URL
+- **Portal**: `POST /api/v1/stripe/portal` → 创建 Customer Portal session(管理订阅)
+- **Webhook**: `POST /api/v1/stripe/webhook` → Stripe 事件处理(checkout.session.completed / subscription.updated / subscription.deleted)
+- **Rate limit**: 基于用户 plan 分层(unauthenticated 3/min, free 10/min, pro 30/min),Windows 60s sliding window
+- **DB**: `stripe_events`(幂等去重) + `stripe_subscriptions`(订阅状态)
+- **Env vars**: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`
+- **Migration**: `npm run migrate-stripe`
+
+### Go Pro flow
+1. User clicks "Go Pro" → `POST /api/v1/stripe/checkout` → redirect to Stripe Checkout
+2. After payment → Stripe sends `checkout.session.completed` webhook
+3. Webhook handler → `users.plan = 'pro'` + `users.stripe_id = customer_id`
+4. User re-authenticates → new JWT includes `stripeId` + `plan = pro`
+5. AuthChip shows "PRO" badge + "Manage" button → Customer Portal
