@@ -35,7 +35,8 @@ export function PricingCards() {
         body: JSON.stringify({ plan }),
       });
       if (res.status === 401) {
-        router.push('/signin?redirect=/pricing');
+        // /signin 是 D7 error fallback(没表单),跳到 /create 让 AuthChip 展开 MagicLinkForm
+        router.push('/create?redirect=/pricing');
         return;
       }
       if (!res.ok) {
@@ -57,7 +58,7 @@ export function PricingCards() {
     try {
       const res = await fetch('/api/v1/stripe/portal', { method: 'POST' });
       if (res.status === 401) {
-        router.push('/signin?redirect=/pricing');
+        router.push('/create?redirect=/pricing');
         return;
       }
       if (!res.ok) {
