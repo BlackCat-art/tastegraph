@@ -7,15 +7,15 @@
  * 注意: users 表已含 stripe_id / plan 字段,D8 只建 stripe_events 表
  */
 
-import { neon } from "@neondatabase/serverless";
-import * as fs from "node:fs";
-import * as path from "node:path";
+import { Pool } from "@neondatabase/serverless";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
 
 // 自动从 .dev.vars 加载 env(本地 migrate 专用,prod wrangler 注入 secret 不走这路径)
 function loadDevVars() {
-  const envPath = path.join(process.cwd(), ".dev.vars");
-  if (!fs.existsSync(envPath)) return;
-  const content = fs.readFileSync(envPath, "utf-8");
+  const envPath = join(process.cwd(), ".dev.vars");
+  if (!existsSync(envPath)) return;
+  const content = readFileSync(envPath, "utf-8");
   for (const line of content.split("\n")) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith("#")) continue;
@@ -34,21 +34,19 @@ async function main() {
     throw new Error("DATABASE_URL is not set");
   }
 
-  const sql = neon(DATABASE_URL);
+  const sqlPath = join(process.cwd(), "migrations", "0001_stripe_events.sql");
+  const sqlText = readFileSync(sqlPath, "utf-8");
 
-  const sqlPath = path.join(import.meta.dirname ?? __dirname, "..", "migrations", "0001_stripe_events.sql");
-  const raw = fs.readFileSync(sqlPath, "utf-8");
-  const statements = raw
-    .split(";")
-    .map((s) => s.trim())
-    .filter((s) => s.length > 0 && !s.startsWith("--"));
-
-  for (const stmt of statements) {
-    console.log("  →", stmt.slice(0, 80).replace(/\s+/g, " "));
-    await sql.unsafe(stmt);
+  // 用 Pool 而非 neon():Pool.client.query() 支持多语句,不会被 split 逻辑丢
+  // neon() 是 tagged template,只支持参数化 SQL
+  const pool = new Pool({ connectionString: DATABASE_URL });
+  try {
+    await pool.query(sqlText);
+    console.log("✓ Migration 0001_stripe_events applied");
+    console.log("✓ D8 Stripe tables migrated");
+  } finally {
+    await pool.end();
   }
-
-  console.log("✅ D8 Stripe tables migrated");
 }
 
 main().catch((e) => {
