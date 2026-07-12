@@ -58,27 +58,8 @@ export const stripeEvents = pgTable(
   }),
 );
 
-export const stripeSubscriptions = pgTable(
-  "stripe_subscriptions",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }).notNull(),
-    stripeSubscriptionId: text("stripe_subscription_id").notNull(),
-    stripeCustomerId: text("stripe_customer_id"),
-    status: text("status").notNull().default("active"),
-    currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (t) => ({
-    userIdIdx: index("stripe_subscriptions_user_id_idx").on(t.userId),
-    subscriptionIdIdx: index("stripe_subscriptions_sub_id_idx").on(t.stripeSubscriptionId),
-  }),
-);
-
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type RenderLog = typeof renderLogs.$inferSelect;
 export type NewRenderLog = typeof renderLogs.$inferInsert;
 export type StripeEvent = typeof stripeEvents.$inferSelect;
-export type StripeSubscription = typeof stripeSubscriptions.$inferSelect;

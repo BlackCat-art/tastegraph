@@ -113,13 +113,6 @@ function createStripeClient(options: StripeClientOptions) {
      * 验证 webhook signature
      */
     async verifyWebhookSignature(payload: string, signature: string, secret: string): Promise<StripeWebhookEvent> {
-      // 使用 Stripe 的 webhook 签名验证
-      const { createHmac } = await import("node:crypto");
-      const hmac = createHmac("sha256", secret);
-      hmac.update(payload);
-      const expectedSignature = hmac.digest("hex");
-
-      // 简单时间戳容差(5 分钟)
       const parts = signature.split(",");
       const tsPart = parts.find((p) => p.startsWith("t="));
       const sigPart = parts.find((p) => p.startsWith("v1="));
@@ -134,11 +127,25 @@ function createStripeClient(options: StripeClientOptions) {
         throw new Error("Webhook timestamp too old");
       }
 
-      // 用 Stripe 的签名方案验证
-      const signedPayload = `${timestamp}.${payload}`;
-      const computedSig = createHmac("sha256", secret).update(signedPayload).digest("hex");
+      // HMAC-SHA256 via Web Crypto API(CF Workers 兼容)
+      const encoder = new TextEncoder();
+      const keyData = encoder.encode(secret);
+      const messageData = encoder.encode(`${timestamp}.${payload}`);
 
-      if (computedSig !== sigPart.slice(3)) {
+      const cryptoKey = await crypto.subtle.importKey(
+        "raw",
+        keyData,
+        { name: "HMAC", hash: "SHA-256" },
+        false,
+        ["sign"],
+      );
+
+      const sigBytes = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
+      const expectedSig = Array.from(new Uint8Array(sigBytes))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+
+      if (expectedSig !== sigPart.slice(3)) {
         throw new Error("Invalid webhook signature");
       }
 

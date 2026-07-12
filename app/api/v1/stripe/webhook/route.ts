@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getStripeClient } from "@/lib/stripe/client";
+import { isEventProcessed, recordEvent, upgradeUserToPro, downgradeUserToFree } from "@/lib/stripe/sync-user";
 
 export const dynamic = "force-dynamic";
 
@@ -6,9 +8,8 @@ export const dynamic = "force-dynamic";
  * POST /api/v1/stripe/webhook
  *
  * Stripe 发送的事件:
- * - checkout.session.completed → 更新 user.plan = 'pro', 写 stripe_subscriptions
- * - customer.subscription.updated → 更新 subscription status
- * - customer.subscription.deleted → 用户取消订阅,降级 plan = 'free'
+ * - checkout.session.completed → 升级 user.plan = 'pro'
+ * - customer.subscription.deleted → 降级 user.plan = 'free'
  *
  * 幂等: 通过 stripe_events 表去重
  */
@@ -31,8 +32,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const rawBody = await req.text();
 
-  // Validate webhook signature
-  const { getStripeClient } = await import("@/lib/stripe/client");
   const stripe = getStripeClient();
 
   let event: { id: string; type: string; data: { object: Record<string, unknown> } };
@@ -45,85 +44,35 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
   }
 
-  // 幂等去重
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
-    const { env } = await getCloudflareContext();
-    const db = (env as any).DB;
-
-    if (!db) {
-      return NextResponse.json({ ok: true, reason: "no-db" });
-    }
-
-    const existing = await db.prepare(
-      "SELECT id FROM stripe_events WHERE stripe_event_id = ? LIMIT 1",
-    ).bind(event.id).first();
-
-    if (existing) {
+    // 幂等去重
+    const alreadyProcessed = await isEventProcessed(event.id);
+    if (alreadyProcessed) {
       return NextResponse.json({ ok: true, reason: "duplicate" });
     }
 
-    // 记录 event(幂等)
-    await db.prepare(
-      "INSERT INTO stripe_events (stripe_event_id, type, payload) VALUES (?, ?, ?)",
-    ).bind(event.id, event.type, JSON.stringify(event)).run();
+    // 记录 event
+    await recordEvent(event.id, event.type, event);
 
     const obj = event.data.object as Record<string, unknown>;
 
     switch (event.type) {
       case "checkout.session.completed": {
         const customerId = obj.customer as string;
-        const subscriptionId = obj.subscription as string;
         const metadata = obj.metadata as Record<string, string> | undefined;
         const userId = metadata?.userId;
 
         if (userId && customerId) {
-          // 更新 user plan → pro
-          await db.prepare(
-            "UPDATE users SET plan = 'pro', stripe_id = ? WHERE id = ?",
-          ).bind(customerId, userId).run();
-
-          // 写 subscription
-          if (subscriptionId) {
-            await db.prepare(
-              `INSERT INTO stripe_subscriptions (user_id, stripe_subscription_id, stripe_customer_id, status)
-               VALUES (?, ?, ?, 'active')`,
-            ).bind(userId, subscriptionId, customerId).run();
-          }
-        }
-        break;
-      }
-
-      case "customer.subscription.updated": {
-        const subscriptionId = obj.id as string;
-        const status = obj.status as string;
-        const customerId = obj.customer as string;
-
-        // 更新 subscription status
-        await db.prepare(
-          "UPDATE stripe_subscriptions SET status = ?, updated_at = datetime('now') WHERE stripe_subscription_id = ?",
-        ).bind(status, subscriptionId).run();
-
-        if (status === "canceled" || status === "unpaid") {
-          // 降级用户 plan
-          await db.prepare(
-            "UPDATE users SET plan = 'free' WHERE stripe_id = ?",
-          ).bind(customerId).run();
+          await upgradeUserToPro(userId, customerId);
         }
         break;
       }
 
       case "customer.subscription.deleted": {
-        const subscriptionId = obj.id as string;
         const customerId = obj.customer as string;
-
-        await db.prepare(
-          "UPDATE stripe_subscriptions SET status = 'canceled', updated_at = datetime('now') WHERE stripe_subscription_id = ?",
-        ).bind(subscriptionId).run();
-
-        await db.prepare(
-          "UPDATE users SET plan = 'free' WHERE stripe_id = ?",
-        ).bind(customerId).run();
+        if (customerId) {
+          await downgradeUserToFree(customerId);
+        }
         break;
       }
     }

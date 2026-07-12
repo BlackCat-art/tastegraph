@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getOptionalUser } from "@/lib/auth/session";
+import { getCurrentUser } from "@/lib/auth/session";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
-  const user = await getOptionalUser(req);
+  const user = await getCurrentUser(req);
   if (!user) {
     return NextResponse.json(
       { ok: false, error: { code: "UNAUTHORIZED", message: "Sign in first", retryable: false } },

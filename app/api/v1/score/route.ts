@@ -18,10 +18,11 @@ async function getEnv(): Promise<Record<string, any>> {
 export async function POST(req: NextRequest) {
   // D8 rate limit
   const { getOptionalUser } = await import("@/lib/auth/session");
-  const { getRateLimitKey, checkRateLimit } = await import("@/lib/stripe/rate-limit");
+  const { getRateLimitKey } = await import("@/lib/rate-limit/check");
+  const { checkRateLimit } = await import("@/lib/rate-limit/upstash");
   const user = await getOptionalUser(req);
   const rateKey = getRateLimitKey({ userId: user?.id, ip: req.headers.get("x-forwarded-for") ?? "127.0.0.1" });
-  const rateResult = checkRateLimit(rateKey, user?.plan ?? null);
+  const rateResult = await checkRateLimit(rateKey, user?.plan ?? null);
   if (!rateResult.allowed) {
     return NextResponse.json(
       {

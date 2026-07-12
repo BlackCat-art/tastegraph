@@ -44,25 +44,25 @@ export async function getOptionalUser(req: Request): Promise<CurrentUser | null>
   if (!user) return null;
 
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
-    const { env } = await getCloudflareContext();
-    const db = (env as any).DB;
-    if (!db) return user; // fallback to JWT data
+    const { db } = await import("@/lib/db/client");
+    const { users } = await import("@/lib/db/schema");
+    const { eq } = await import("drizzle-orm");
 
-    const result = await db.prepare(
-      "SELECT id, email, plan, stripe_id FROM users WHERE id = ? LIMIT 1",
-    ).bind(user.id).first() as { id: string; email: string; plan: string; stripe_id: string | null } | null;
+    const row = await db.query.users.findFirst({
+      where: eq(users.id, user.id),
+      columns: { id: true, email: true, plan: true, stripeId: true },
+    });
 
-    if (!result) return null;
+    if (!row) return null;
 
     return {
-      id: result.id,
-      email: result.email,
-      plan: result.plan,
-      stripeId: result.stripe_id ?? null,
+      id: row.id,
+      email: row.email,
+      plan: row.plan,
+      stripeId: row.stripeId ?? null,
     };
   } catch {
-    // D1 不可用时 fallback 到 JWT 数据
+    // Drizzle 不可用时 fallback 到 JWT 数据
     return user;
   }
 }

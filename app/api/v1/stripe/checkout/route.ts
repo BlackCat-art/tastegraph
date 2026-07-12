@@ -12,6 +12,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     );
   }
 
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { ok: false, error: { code: "STRIPE_NOT_CONFIGURED", message: "Stripe is not configured", retryable: false } },
+      { status: 500 },
+    );
+  }
+
   const priceId = process.env.STRIPE_PRICE_ID;
   if (!priceId) {
     return NextResponse.json(
