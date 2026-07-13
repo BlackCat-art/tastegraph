@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", title: "tastegraph" },
   icons: { icon: "/favicon.ico" },
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
