@@ -152,7 +152,7 @@ export default function InstagramMusicGraphicsPage() {
       {/* Footer */}
       <footer className="border-t border-line">
         <div className="mx-auto max-w-5xl px-6 py-10">
-          <div className="grid gap-8 sm:grid-cols-3">
+          <div className="grid gap-8 sm:grid-cols-4">
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-fgmute">Use cases</h3>
               <ul className="mt-3 space-y-2 text-sm">
@@ -168,6 +168,13 @@ export default function InstagramMusicGraphicsPage() {
               <ul className="mt-3 space-y-2 text-sm">
                 <li><Link href="/create" className="text-fg hover:text-accent">Create a poster</Link></li>
                 <li><Link href="/pricing" className="text-fg hover:text-accent">Pricing</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-fgmute">Legal</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><Link href="/privacy" className="text-fg hover:text-accent">Privacy policy</Link></li>
+                <li><Link href="/terms" className="text-fg hover:text-accent">Terms of service</Link></li>
               </ul>
             </div>
             <div>
