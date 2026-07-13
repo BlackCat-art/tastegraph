@@ -6,6 +6,7 @@ import type { ScoreResult } from "@/lib/types";
 import PosterTemplate from "@/app/_components/poster/PosterTemplate";
 import { AuthChip } from "@/app/_components/AuthChip";
 import { MagicLinkForm } from "@/app/_components/MagicLinkForm";
+import Link from "next/link";
 import {
   EDITORIAL_ACCENTS,
   MODERNIST_ACCENTS,
@@ -501,6 +502,45 @@ export default function CreatePage() {
           <p className="mt-2 text-sm text-fg">{result.message}</p>
         </div>
       )}
+
+      {/* Footer */}
+      <footer className="border-t border-line">
+        <div className="mx-auto max-w-5xl px-6 py-10">
+          <div className="grid gap-8 sm:grid-cols-4">
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-fgmute">Use cases</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><Link href="/for/spotify-playlist-poster" className="text-fg hover:text-accent">Spotify playlist poster</Link></li>
+                <li><Link href="/for/music-personality" className="text-fg hover:text-accent">Music personality test</Link></li>
+                <li><Link href="/for/playlist-cover-art-generator" className="text-fg hover:text-accent">Playlist cover art</Link></li>
+                <li><Link href="/for/instagram-music-graphics" className="text-fg hover:text-accent">Instagram music graphics</Link></li>
+                <li><Link href="/for/tiktok-playlist-poster" className="text-fg hover:text-accent">TikTok playlist poster</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-fgmute">Product</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><Link href="/create" className="text-fg hover:text-accent">Create a poster</Link></li>
+                <li><Link href="/pricing" className="text-fg hover:text-accent">Pricing</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-fgmute">Legal</h3>
+              <ul className="mt-3 space-y-2 text-sm">
+                <li><Link href="/privacy" className="text-fg hover:text-accent">Privacy policy</Link></li>
+                <li><Link href="/terms" className="text-fg hover:text-accent">Terms of service</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-fgmute">tastegraph</h3>
+              <p className="mt-3 text-sm text-fgmute">Your Spotify playlist, but make it a magazine.</p>
+            </div>
+          </div>
+          <div className="mt-10 text-xs text-fgfaint">
+            © {new Date().getFullYear()} tastegraph. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
