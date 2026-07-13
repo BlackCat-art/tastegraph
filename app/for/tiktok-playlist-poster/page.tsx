@@ -11,11 +11,22 @@ export const metadata: Metadata = {
     title: "TikTok Playlist Poster — 9:16 Cover Art for Music Creators | tastegraph",
     description: "9:16 editorial-style posters for TikTok, Reels, and YouTube Shorts. Free, no login. 30 seconds from Spotify link to share-ready cover.",
     type: "article",
+    images: [
+      {
+        url: "https://tastegraph.18571729942.workers.dev/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "tastegraph — Your Spotify playlist, but make it a magazine.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "TikTok Playlist Poster — 9:16 Cover Art for Music Creators | tastegraph",
     description: "9:16 editorial-style posters for TikTok, Reels, and YouTube Shorts. Free, no login. 30 seconds from Spotify link to share-ready cover.",
+    images: [
+      "https://tastegraph.18571729942.workers.dev/opengraph-image",
+    ],
   },
 };
 

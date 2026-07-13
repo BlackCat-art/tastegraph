@@ -11,11 +11,22 @@ export const metadata: Metadata = {
     title: "Playlist Cover Art Generator — Editorial-Style Playlist Art | tastegraph",
     description: "Generate editorial-style cover art for any playlist. Three templates, three aspect ratios, free. No Photoshop needed.",
     type: "article",
+    images: [
+      {
+        url: "https://tastegraph.18571729942.workers.dev/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "tastegraph — Your Spotify playlist, but make it a magazine.",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Playlist Cover Art Generator — Editorial-Style Playlist Art | tastegraph",
     description: "Generate editorial-style cover art for any playlist. Three templates, three aspect ratios, free. No Photoshop needed.",
+    images: [
+      "https://tastegraph.18571729942.workers.dev/opengraph-image",
+    ],
   },
 };
 
