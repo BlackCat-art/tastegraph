@@ -144,7 +144,7 @@ export default function RadarChart({
               textAnchor="middle"
               dominantBaseline="middle"
               className="fill-fgmute"
-              style={{ fontSize: "11px" }}
+              style={{ fill: "#c8c8c8", fontSize: "11px" }}
             >
               {showValues ? `${label} ${scores[key]}` : label}
             </text>
