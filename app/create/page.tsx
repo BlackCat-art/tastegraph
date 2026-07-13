@@ -68,7 +68,6 @@ export default function CreatePage() {
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#0a0a0a",
-        includeStyleProperties: ["fill"],   // D13 fix: SVG text 需要 fill prop 保留
       });
       const link = document.createElement("a");
       const slug = result.kind === "ok" && result.score?.personalityLabel
