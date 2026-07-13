@@ -48,6 +48,10 @@ export default function CreatePage() {
   const [posterModernistAccent, setPosterModernistAccent] = useState<ModernistAccent>("red");
   const [posterRisographPalette, setPosterRisographPalette] = useState<RisographPalette>("blue-red");
   const [signInOpen, setSignInOpen] = useState(false);
+  // D10 分享状态
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const handleTemplateChange = (kind: PosterKind) => {
     setPosterKind(kind);
@@ -77,6 +81,61 @@ export default function CreatePage() {
       link.click();
     } catch (e) {
       console.error("Download failed:", e);
+    }
+  };
+
+  const handleShare = async () => {
+    if (result.kind !== "ok" || !result.score) return;
+    setSharing(true);
+    setShareCopied(false);
+    try {
+      // D10 收集当前海报数据
+      const accent =
+        posterKind === "editorial" ? posterEditorialAccent :
+        posterKind === "modernist" ? posterModernistAccent :
+        posterRisographPalette;
+      const res = await fetch("/api/v1/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          v: 1,
+          kind: posterKind,
+          accent,
+          aspectRatio: posterAspectRatio,
+          fontFamily: posterFontFamily,
+          playlistTitle: result.title,
+          trackCount: result.trackCount,
+          personalityLabel: result.score.personalityLabel,
+          personalityOneLiner: result.score.personalityOneLiner,
+          summary: result.score.summary,
+          scores: result.score.scores,
+        }),
+      });
+      const data = (await res.json()) as
+        | { ok: true; id: string; url: string }
+        | { ok: false; error: { code: string; message: string } };
+      if (data.ok) {
+        setShareUrl(data.url);
+      } else {
+        console.error("Share failed:", data.error);
+        alert(`Share failed: ${data.error.message}`);
+      }
+    } catch (e) {
+      console.error("Share error:", e);
+      alert("Share failed. Please try again.");
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const handleCopyShare = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch (e) {
+      console.error("Copy failed:", e);
     }
   };
 
@@ -369,8 +428,8 @@ export default function CreatePage() {
               />
             </div>
 
-            {/* Action buttons (Download + Go Pro — both placeholders) */}
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+            {/* Action buttons (Download + Share + Go Pro) */}
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
               <button
                 type="button"
                 onClick={handleDownload}
@@ -380,12 +439,44 @@ export default function CreatePage() {
               </button>
               <button
                 type="button"
+                onClick={handleShare}
+                disabled={sharing}
+                className="rounded-lg border border-line bg-bgcard px-6 py-3 text-sm font-semibold text-fg hover:border-accent disabled:opacity-50"
+              >
+                {sharing ? "Sharing..." : "Share 🔗"}
+              </button>
+              <button
+                type="button"
                 onClick={() => console.log("TODO D9: Stripe checkout")}
                 className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-bg hover:bg-accent2"
               >
                 Go Pro $4.99
               </button>
             </div>
+
+            {/* D10 分享结果 panel */}
+            {shareUrl && (
+              <div className="mt-4 rounded-lg border border-line bg-bgcard p-4">
+                <div className="text-xs uppercase tracking-wide text-accent2">
+                  Share link · expires in 90 days
+                </div>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <input
+                    readOnly
+                    value={shareUrl}
+                    onClick={(e) => (e.target as HTMLInputElement).select()}
+                    className="flex-1 rounded border border-line bg-bg px-3 py-2 text-xs text-fg"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyShare}
+                    className="rounded bg-accent px-4 py-2 text-xs font-semibold text-bg hover:bg-accent2"
+                  >
+                    {shareCopied ? "Copied ✓" : "Copy"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

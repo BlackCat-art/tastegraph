@@ -3,7 +3,7 @@ import { getRateLimitLimit, getEndOfUtcDay, type LimitResult } from './check';
 
 export async function checkRateLimit(params: {
   identifier: string;
-  bucket: 'parse' | 'score';
+  bucket: 'parse' | 'score' | 'share';
   plan: string | null;
 }): Promise<LimitResult> {
   const limit = getRateLimitLimit(params.plan);

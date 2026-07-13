@@ -5,7 +5,9 @@ export const metadata: Metadata = {
   title: "tastegraph — Your Spotify playlist, but make it a magazine.",
   description:
     "Paste a Spotify playlist link. Get a magazine-quality poster of your music personality in 30 seconds. Editorial templates, share-ready, 100% on the web.",
-  metadataBase: new URL("https://tastegraph.app"),
+  // D10: 指向真实部署 URL(原 tastegraph.app 域名未注册,OG meta 会指向死链)
+  // TODO: 拿到 tastegraph.app 域名后改回
+  metadataBase: new URL("https://tastegraph.18571729942.workers.dev"),
   openGraph: {
     title: "tastegraph",
     description: "Your Spotify playlist, but make it a magazine.",
