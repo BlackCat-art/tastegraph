@@ -70,7 +70,7 @@ export default function RadarChart({
   return (
     <div className="flex flex-col items-center gap-6">
       <svg
-        viewBox={`0 0 ${size} ${size}`}
+        viewBox={`-40 -40 ${size + 80} ${size + 80}`}
         className="w-full max-w-sm"
         aria-label="5-dimension radar chart"
       >
