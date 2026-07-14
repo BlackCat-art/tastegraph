@@ -22,7 +22,7 @@ const EditorialPoster = forwardRef<HTMLDivElement, PosterTemplateProps>(
     return (
       <div
         ref={ref}
-        className={`relative ${ASPECT_RATIO_CLASS[aspectRatio ?? "1:1"]} w-full max-w-[480px] overflow-hidden rounded-lg border border-line bg-bg p-8 text-fg shadow-2xl`}
+        className={`relative ${ASPECT_RATIO_CLASS[aspectRatio ?? "1:1"]} mx-auto w-full max-w-[480px] overflow-hidden rounded-lg border border-line bg-bg p-8 text-fg shadow-2xl`}
       >
         {/* Logo — 保持 font-mono 品牌一致性 */}
         <div className="text-xs font-mono uppercase tracking-[0.2em] text-fgmute">
