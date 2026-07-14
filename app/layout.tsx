@@ -22,6 +22,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
+      <head>
+        {/* D14: Plausible analytics(privacy-friendly, GDPR safe, no cookie) */}
+        <script
+          defer
+          data-domain="tastegraph.org"
+          src="https://plausible.io/js/script.js"
+        />
+      </head>
       <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
