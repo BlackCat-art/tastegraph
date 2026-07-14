@@ -1,0 +1,24 @@
+# Lemon Squeezy D14 — to be injected to CF Worker secrets
+#
+# 1. Open this file in TextEdit:
+#      open -e ~/dev/tastegraph/.dev.vars.ls.template
+#
+# 2. Replace each PASTE_*_HERE with the actual value from Lemon Squeezy Dashboard.
+#    DO NOT paste anything into the chat. This file is local-only.
+#
+# 3. Save (Cmd+S) and close.
+#
+# 4. Tell the assistant "filled" — they'll read this file and run
+#    `wrangler secret put <KEY>` for each line below.
+#
+# Reference:
+# - LS_API_KEY:       Settings → API → Create API key (Full access)
+# - LS_VARIANT_ID_*:  Products → [product] → URL contains /buy/<id>
+# - LS_WEBHOOK_SECRET:Settings → Webhooks → Add endpoint, copy secret
+#
+# 重要:不要把任何 key 复制粘贴到 OpenClaw 对话框,只能写在这个本地文件里。
+
+LS_API_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5NGQ1OWNlZi1kYmI4LTRlYTUtYjE3OC1kMjU0MGZjZDY5MTkiLCJqdGkiOiI3NjhlOTk4MTA5NjVlMWQ0ZjQ3MjU4OTVhNjA3YWNmZGMwNDIxYzZkZDM3MTA3ZTZmZWM3MWNjMGJmMjBmOTJjYWU3ZTUyNDg4YjVlNjk0NSIsImlhdCI6MTc4NDAzNzEzMi41NzcwMDMsIm5iZiI6MTc4NDAzNzEzMi41NzcwMDUsImV4cCI6MTc5OTg4NDgwMC4wMjczMzEsInN1YiI6Ijc1ODIyMDEiLCJzY29wZXMiOltdfQ.7J_iY4elIUAnNY2gu9QWdye3fZXqNkKj04PAxvU97lSBJt2nfJxCsM2N03pk5nzqMfub43PPeDtN3xt0TWlffLNPxsPtEisYOKKDy6uTpWKREKydvjkne6SCxlbJwJ1HB8fvp9XbKA9_nbBTx-x8HiJHrQUHqbc400_iL-GtYr-vkMyxdTTVCK3F1KP0EVZmGsIedEWopwQIQP0R25K4st-JBv_qt48D2cwQW8HnT4WEx7TZ1XTyjDFCJWPNIxCkf0Lh9hvmenrR5uCeOtpTTAOFClC4DFvfvKmS1n3FPPPIj-S1dXRqtyk5uXVEIA2R1SxALE5mOu3qoTymuxwBtNqscfLq6sNftmgREfkzXMfW3dio0k5CPG6Mu3qjRY5TK_S-eZvFudJbmuquGYSqgqMqq84GlvC7ChayKv2zzHaT6paYZGRh6FukBMk6B8f9lvKaX766hxCPNVXrP4wZX4SUb-IrCdcj3mOeIm3P5YIxh7yOjqAZdlOTuBhYeSLYNPsMf9Kd2bPH-Sm46uFEuuzoALfuQQPUlgA-xZNidgF6noVQvZuhSbamSe85OhnLxPUva549cyfca3obTVpecntdOVRkwpGeaTDskwaeD5-Aq1G8cbYFcn4fzuoO915p_GimwovD2qKuVetDmgPsA80LCjBjg2_5ONvAfbYyRso
+LS_VARIANT_ID_MONTHLY=PASTE_LS_VARIANT_ID_MONTHLY_HERE
+LS_VARIANT_ID_YEARLY=PASTE_LS_VARIANT_ID_YEARLY_HERE
+LS_WEBHOOK_SECRET=PASTE_LS_WEBHOOK_SECRET_HERE

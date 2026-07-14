@@ -91,20 +91,12 @@ export function AuthChip({ onSignInClick }: { onSignInClick: () => void }) {
             Manage
           </button>
         ) : (
-          <button
-            onClick={async () => {
-              const res = await fetch("/api/v1/stripe/checkout", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan: "monthly" }),
-              });
-              const body = await res.json() as { ok: boolean; url?: string };
-              if (body.ok && body.url) window.location.href = body.url;
-            }}
-            className="rounded bg-accent px-2 py-0.5 text-xs font-semibold text-bg hover:bg-accent2"
+          <span
+            title="Pro subscriptions are temporarily disabled (D14 launch)"
+            className="rounded bg-fgmute px-2 py-0.5 text-xs font-semibold text-fg opacity-50 cursor-not-allowed"
           >
-            Go Pro
-          </button>
+            Pro
+          </span>
         )}
       </div>
       <button

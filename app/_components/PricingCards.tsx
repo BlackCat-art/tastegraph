@@ -94,18 +94,34 @@ export function PricingCards() {
     );
   }
 
+  // D14 Plan A: Pro 支付通道在中国大陆被 Stripe / PayPal 阻 — disable
+  return (
+    <div className="rounded-xl border border-line bg-bgcard p-8 text-center">
+      <p className="text-2xl font-bold mb-2 text-fg">Pro — Coming soon</p>
+      <p className="text-sm text-fgmute mb-4 max-w-md mx-auto">
+        Pro subscriptions are temporarily disabled while we set up payment
+        infrastructure for our launch. Stay tuned — we&apos;ll re-enable Pro
+        on this page as soon as it&apos;s ready.
+      </p>
+      <p className="text-xs text-fgfaint">
+        In the meantime, Free (3 renders/day) is fully functional.
+      </p>
+    </div>
+  );
+}
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {PLANS.map((p) => (
-          <div key={p.id} className="border border-gray-200 rounded-xl p-8 shadow-sm hover:shadow-md transition">
-            <h2 className="text-2xl font-bold mb-2">{p.label}</h2>
-            <p className="text-5xl font-extrabold mb-1">
+          <div key={p.id} className="border border-line rounded-xl p-8 bg-bgcard opacity-60">
+            <h2 className="text-2xl font-bold mb-2 text-fg">{p.label}</h2>
+            <p className="text-5xl font-extrabold mb-1 text-fg">
               {p.price}
-              <span className="text-lg text-gray-500 font-normal">{p.period}</span>
+              <span className="text-lg text-fgmute font-normal">{p.period}</span>
             </p>
-            {p.save && <p className="text-green-600 font-semibold mb-4">{p.save}</p>}
-            <ul className="space-y-2 mb-6 text-gray-700">
+            {p.save && <p className="text-fgmute font-semibold mb-4">{p.save}</p>}
+            <ul className="space-y-2 mb-6 text-fgmute">
               <li>✓ Unlimited renders</li>
               <li>✓ No watermark</li>
               <li>✓ All templates & palettes</li>
@@ -113,11 +129,10 @@ export function PricingCards() {
               <li>✓ Cancel anytime</li>
             </ul>
             <button
-              onClick={() => handleSubscribe(p.id)}
-              disabled={loading !== null}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg disabled:opacity-50 transition"
+              disabled
+              className="w-full bg-fgmute text-fg font-semibold py-3 px-4 rounded-lg opacity-50 cursor-not-allowed"
             >
-              {loading === p.id ? 'Loading...' : `Subscribe ${p.label}`}
+              Coming soon
             </button>
           </div>
         ))}

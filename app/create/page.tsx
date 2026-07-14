@@ -448,18 +448,11 @@ export default function CreatePage() {
               </button>
               <button
                 type="button"
-                onClick={async () => {
-                  const res = await fetch("/api/v1/stripe/checkout", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ plan: "monthly" }),
-                  });
-                  const data = await res.json() as { ok: boolean; url?: string };
-                  if (data.ok && data.url) window.location.href = data.url;
-                }}
-                className="rounded-lg bg-accent px-6 py-3 text-sm font-semibold text-bg hover:bg-accent2"
+                disabled
+                title="Pro subscriptions are temporarily disabled (D14 launch)"
+                className="rounded-lg bg-fgmute px-6 py-3 text-sm font-semibold text-fg opacity-50 cursor-not-allowed"
               >
-                Go Pro $4.99
+                Go Pro — Coming soon
               </button>
             </div>
 
