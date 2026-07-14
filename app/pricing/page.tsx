@@ -13,7 +13,7 @@ export default function PricingPage() {
       <p className="text-fgmute mb-8">Cancel anytime. 30-day money-back guarantee.</p>
       <PricingCards />
       <p className="text-sm text-fgmute mt-8">
-        Questions? Email <a href="mailto:hi@tastegraph.app" className="underline">hi@tastegraph.app</a>.
+        Questions? Email <a href="mailto:hi@tastegraph.org" className="underline">hi@tastegraph.org</a>.
       </p>
 
       <footer className="border-t border-line mt-16">

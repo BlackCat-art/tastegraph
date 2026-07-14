@@ -47,7 +47,7 @@ export default function PrivacyPage() {
         </nav>
 
         <h2 id="intro">1. Introduction</h2>
-        <p>tastegraph ("we", "us", "our") operates the website tastegraph.app and the worker deployment at tastegraph.org (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
+        <p>tastegraph ("we", "us", "our") operates the website tastegraph.org and the worker deployment at tastegraph.org (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
         <p>By using the Service, you agree to the collection and use of information in accordance with this policy.</p>
 
         <h2 id="info-collected">2. Information We Collect</h2>
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
           <li>Providing the Service: parsing your Spotify playlist, computing personality scores, rendering the poster, generating a shareable link.</li>
           <li>Authentication: issuing magic-link emails and session JWTs.</li>
           <li>Rate limiting: preventing abuse (3 / 5 / unlimited renders per day depending on tier).</li>
-          <li>Communicating with you: only when you contact us at hi@tastegraph.app.</li>
+          <li>Communicating with you: only when you contact us at hi@tastegraph.org.</li>
         </ul>
         <p>We do not sell your personal data to third parties.</p>
 
@@ -97,16 +97,16 @@ export default function PrivacyPage() {
           <li><strong>Data portability</strong> (export your account data)</li>
           <li><strong>Withdraw consent</strong> at any time</li>
         </ul>
-        <p>To exercise these rights, email hi@tastegraph.app. We respond within 30 days.</p>
+        <p>To exercise these rights, email hi@tastegraph.org. We respond within 30 days.</p>
 
         <h2 id="children">7. Children's Privacy</h2>
-        <p>Our Service is not directed to children under 13 (COPPA) or 16 (GDPR). We do not knowingly collect personal data from children. If you believe a child has provided us data, contact hi@tastegraph.app and we will delete it.</p>
+        <p>Our Service is not directed to children under 13 (COPPA) or 16 (GDPR). We do not knowingly collect personal data from children. If you believe a child has provided us data, contact hi@tastegraph.org and we will delete it.</p>
 
         <h2 id="changes">8. Changes to This Policy</h2>
         <p>We may update this policy from time to time. We will notify you of material changes by posting the new policy on this page and updating the "Last updated" date above. Continued use of the Service after changes constitutes acceptance.</p>
 
         <h2 id="contact">9. Contact</h2>
-        <p>Questions about this privacy policy? Email us at <a href="mailto:hi@tastegraph.app">hi@tastegraph.app</a>.</p>
+        <p>Questions about this privacy policy? Email us at <a href="mailto:hi@tastegraph.org">hi@tastegraph.org</a>.</p>
       </article>
 
       {/* Footer */}

@@ -78,7 +78,7 @@ export default function TermsPage() {
           <li>Pro tier is billed monthly ($4.99) or yearly ($39) via Stripe.</li>
           <li>Subscriptions auto-renew unless cancelled before the renewal date.</li>
           <li>Cancellation takes effect at the end of the current billing period; no pro-rata refunds.</li>
-          <li>Refunds: 30-day money-back guarantee for first-time subscribers. Email hi@tastegraph.app.</li>
+          <li>Refunds: 30-day money-back guarantee for first-time subscribers. Email hi@tastegraph.org.</li>
           <li>Price changes: we will notify you 30 days before any price change.</li>
         </ul>
 
@@ -95,7 +95,7 @@ export default function TermsPage() {
 
         <h2 id="termination">8. Termination</h2>
         <ul>
-          <li><strong>By you</strong>: stop using the Service at any time. Email hi@tastegraph.app to delete your account.</li>
+          <li><strong>By you</strong>: stop using the Service at any time. Email hi@tastegraph.org to delete your account.</li>
           <li><strong>By us</strong>: we may suspend or terminate access for violation of these Terms or for operational reasons. Active Pro subscribers will receive 30 days' notice.</li>
         </ul>
 
@@ -103,7 +103,7 @@ export default function TermsPage() {
         <p>These Terms are governed by the laws of the State of Delaware, USA. Disputes will be resolved in the courts of Delaware.</p>
 
         <h2 id="contact">10. Contact</h2>
-        <p>Questions about these Terms? Email us at <a href="mailto:hi@tastegraph.app">hi@tastegraph.app</a>.</p>
+        <p>Questions about these Terms? Email us at <a href="mailto:hi@tastegraph.org">hi@tastegraph.org</a>.</p>
       </article>
 
       {/* Footer */}

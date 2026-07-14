@@ -219,7 +219,7 @@ export default async function Image({ params }: { params: { id: string } }) {
               textTransform: "uppercase",
             }}
           >
-            Make yours at tastegraph.app
+            Make yours at tastegraph.org
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@
  * 1. https://resend.com signup(GitHub 登录免信用卡)
  * 2. dashboard → API Keys → Create API Key(选 "Sending access" 权限)
  * 3. dev 阶段用 onboarding@resend.dev 测试域(免域名验证)
- * 4. 生产前注册 tastegraph.app 域名 + 加 SPF/DKIM/DMARC 记录
+ * 4. 生产前注册 tastegraph.org 域名(以及 SPF/DKIM/DMARC) + 加 SPF/DKIM/DMARC 记录
  *
  * env 来源:
  * - RESEND_API_KEY + RESEND_FROM_EMAIL 在 .dev.vars 和 CF Pages secret
