@@ -82,7 +82,7 @@ export default async function SharePage({ params }: { params: Promise<Params> })
       </div>
 
       {/* 海报主体 */}
-      <div className="overflow-hidden rounded-2xl border border-line bg-bgcard shadow-2xl">
+      <div className="flex justify-center">
         <PosterTemplate
           kind={data.kind}
           accent={hex}
