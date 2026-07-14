@@ -93,7 +93,11 @@ export function AuthChip({ onSignInClick }: { onSignInClick: () => void }) {
         ) : (
           <button
             onClick={async () => {
-              const res = await fetch("/api/v1/stripe/checkout", { method: "POST" });
+              const res = await fetch("/api/v1/stripe/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ plan: "monthly" }),
+              });
               const body = await res.json() as { ok: boolean; url?: string };
               if (body.ok && body.url) window.location.href = body.url;
             }}
