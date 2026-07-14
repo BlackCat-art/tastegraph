@@ -109,35 +109,3 @@ export function PricingCards() {
     </div>
   );
 }
-
-  return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {PLANS.map((p) => (
-          <div key={p.id} className="border border-line rounded-xl p-8 bg-bgcard opacity-60">
-            <h2 className="text-2xl font-bold mb-2 text-fg">{p.label}</h2>
-            <p className="text-5xl font-extrabold mb-1 text-fg">
-              {p.price}
-              <span className="text-lg text-fgmute font-normal">{p.period}</span>
-            </p>
-            {p.save && <p className="text-fgmute font-semibold mb-4">{p.save}</p>}
-            <ul className="space-y-2 mb-6 text-fgmute">
-              <li>✓ Unlimited renders</li>
-              <li>✓ No watermark</li>
-              <li>✓ All templates & palettes</li>
-              <li>✓ Up to 4K resolution</li>
-              <li>✓ Cancel anytime</li>
-            </ul>
-            <button
-              disabled
-              className="w-full bg-fgmute text-fg font-semibold py-3 px-4 rounded-lg opacity-50 cursor-not-allowed"
-            >
-              Coming soon
-            </button>
-          </div>
-        ))}
-      </div>
-      {error && <p className="mt-4 text-red-600">{error}</p>}
-    </>
-  );
-}
