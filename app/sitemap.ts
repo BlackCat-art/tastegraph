@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE = "https://tastegraph.18571729942.workers.dev";
+const BASE = "https://tastegraph.org";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "article",
     images: [
       {
-        url: "https://tastegraph.18571729942.workers.dev/opengraph-image",
+        url: "https://tastegraph.org/opengraph-image",
         width: 1200,
         height: 630,
         alt: "tastegraph — Your Spotify playlist, but make it a magazine.",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Instagram Music Graphics — Editorial Posters for IG Feed & Stories | tastegraph",
     description: "Make your Spotify playlist Instagram-ready. Editorial templates in 1:1, 3:4, 9:16. Free, no login, 30 seconds.",
     images: [
-      "https://tastegraph.18571729942.workers.dev/opengraph-image",
+      "https://tastegraph.org/opengraph-image",
     ],
   },
 };

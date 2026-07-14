@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     type: "article",
     images: [
       {
-        url: "https://tastegraph.18571729942.workers.dev/opengraph-image",
+        url: "https://tastegraph.org/opengraph-image",
         width: 1200,
         height: 630,
         alt: "tastegraph — Your Spotify playlist, but make it a magazine.",
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     title: "Playlist Cover Art Generator — Editorial-Style Playlist Art | tastegraph",
     description: "Generate editorial-style cover art for any playlist. Three templates, three aspect ratios, free. No Photoshop needed.",
     images: [
-      "https://tastegraph.18571729942.workers.dev/opengraph-image",
+      "https://tastegraph.org/opengraph-image",
     ],
   },
 };

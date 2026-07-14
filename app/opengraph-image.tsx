@@ -40,7 +40,7 @@ export default function Image() {
             </div>
           </div>
           <div style={{ display: "flex", fontSize: 18, color: "#7a7a7a" }}>
-            tastegraph.18571729942.workers.dev
+            tastegraph.org
           </div>
         </div>
         <div

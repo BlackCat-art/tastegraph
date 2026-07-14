@@ -47,7 +47,7 @@ export default function PrivacyPage() {
         </nav>
 
         <h2 id="intro">1. Introduction</h2>
-        <p>tastegraph ("we", "us", "our") operates the website tastegraph.app and the worker deployment at tastegraph.18571729942.workers.dev (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
+        <p>tastegraph ("we", "us", "our") operates the website tastegraph.app and the worker deployment at tastegraph.org (the "Service"). This page informs you of our policies regarding the collection, use, and disclosure of personal data when you use our Service.</p>
         <p>By using the Service, you agree to the collection and use of information in accordance with this policy.</p>
 
         <h2 id="info-collected">2. Information We Collect</h2>

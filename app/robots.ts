@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/create"],
       },
     ],
-    sitemap: "https://tastegraph.18571729942.workers.dev/sitemap.xml",
+    sitemap: "https://tastegraph.org/sitemap.xml",
   };
 }

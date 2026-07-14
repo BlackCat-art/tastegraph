@@ -11,5 +11,9 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
-  }
+  },
+  "routes": [
+    { "pattern": "tastegraph.org", "custom_domain": true },
+    { "pattern": "tastegraph.org/*", "custom_domain": true }
+  ]
 }
