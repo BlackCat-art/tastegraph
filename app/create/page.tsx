@@ -61,10 +61,27 @@ export default function CreatePage() {
 
   const posterRef = useRef<HTMLDivElement>(null);
 
+  // D14 round 3: 显式指定 PNG 捕获尺寸,避免 html-to-image standalone 渲染时
+  // w-full / aspect-[3/4] 失效导致尺寸错乱。固定 480px 宽,按 aspectRatio 算高。
+  const ASPECT_DIMS: Record<AspectRatio, { w: number; h: number }> = {
+    "1:1":  { w: 480, h: 480 },
+    "3:4":  { w: 480, h: 640 },
+    "9:16": { w: 480, h: 853 },
+  };
+
   const handleDownload = async () => {
     if (!posterRef.current) return;
     try {
+      const dims = ASPECT_DIMS[posterAspectRatio];
       const dataUrl = await toPng(posterRef.current, {
+        width: dims.w,
+        height: dims.h,
+        style: {
+          width: `${dims.w}px`,
+          height: `${dims.h}px`,
+          margin: "0",
+          transform: "none",
+        },
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#0a0a0a",
