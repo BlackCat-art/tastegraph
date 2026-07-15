@@ -16,3 +16,7 @@ coverage/
 .dev.vars
 .open-next/
 .wrangler/
+
+# D14 security: scripts/_test-mint-jwt.mjs contained hardcoded JWT_SECRET + DATABASE_URL
+# Removed in commit <本 commit>. Never re-add — use .dev.vars or env vars.
+scripts/_test-mint-jwt.mjs
