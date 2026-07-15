@@ -451,10 +451,11 @@ export default function CreatePage() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
               <button
                 type="button"
-                onClick={handleDownload}
-                className="rounded-lg border border-line bg-bgcard px-6 py-3 text-sm font-semibold text-fg hover:border-accent"
+                disabled
+                title="PNG download is temporarily disabled (D14 launch, html-to-image grid stroke bug). Re-enable in v0.2."
+                className="rounded-lg border border-line bg-fgmute px-6 py-3 text-sm font-semibold text-fg opacity-50 cursor-not-allowed"
               >
-                Download PNG 🆓
+                Download PNG — Coming soon
               </button>
               <button
                 type="button"
