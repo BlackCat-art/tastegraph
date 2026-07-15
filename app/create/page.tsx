@@ -43,7 +43,7 @@ export default function CreatePage() {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState<Result>({ kind: "idle" });
   const [posterKind, setPosterKind] = useState<PosterKind>("editorial");
-  const [posterAspectRatio, setPosterAspectRatio] = useState<AspectRatio>("1:1");
+  const [posterAspectRatio, setPosterAspectRatio] = useState<AspectRatio>("3:4");
   const [posterFontFamily, setPosterFontFamily] = useState<FontFamily>(DEFAULT_FONT_BY_KIND["editorial"]);
   const [posterEditorialAccent, setPosterEditorialAccent] = useState<EditorialAccent>("orange");
   const [posterModernistAccent, setPosterModernistAccent] = useState<ModernistAccent>("red");

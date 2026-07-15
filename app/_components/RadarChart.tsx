@@ -71,7 +71,7 @@ export default function RadarChart({
     <div className="flex flex-col items-center gap-6">
       <svg
         viewBox={`-40 -40 ${size + 80} ${size + 80}`}
-        className="w-full max-w-sm"
+        className="w-full max-w-xs"
         aria-label="5-dimension radar chart"
       >
         {/* grid: 4 concentric rings at 0.25/0.5/0.75/1.0 */}
