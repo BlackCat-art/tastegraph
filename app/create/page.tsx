@@ -68,6 +68,7 @@ export default function CreatePage() {
         cacheBust: true,
         pixelRatio: 2,
         backgroundColor: "#0a0a0a",
+        includeStyleProperties: ["fill"],   // 恢复 D13 fix: SVG fill 在 PNG 转换中需保留
       });
       const link = document.createElement("a");
       const slug = result.kind === "ok" && result.score?.personalityLabel
